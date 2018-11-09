@@ -1,0 +1,66 @@
+{% load static %}
+
+{% if available_wifis %}
+<div class="mb-3">
+  Press wifi to connect:
+</div>
+{% endif %}
+
+{% for available_wifi in available_wifis %}
+<form role="form" method="POST" action="{% url 'wifi_connect'  %}" class="post-form">
+  {% csrf_token %}
+  {% if available_wifi.connected %}
+  <button type="button" class="btn btn-success btn-lg mb-3 wifi_button" name="{{ wifi_form.ssid.name }}" id="{{ available_wifi.id }}">
+    {{ available_wifi.ssid }} {% if available_wifi.encryption_type %}<i class="fas fa-lock"></i>{% endif %}
+  </button>
+  {% elif available_wifi.known %}
+  <button type="button" class="btn btn-secondary btn-lg mb-3 wifi_button" name="{{ wifi_form.ssid.name }}" id="{{ available_wifi.id }}">
+    {{ available_wifi.ssid }} {% if available_wifi.encryption_type %}<i class="fas fa-lock"></i>{% endif %}
+  </button>
+  {% else %}
+  <button type="button" class="btn btn-primary btn-lg mb-3 wifi_button" name="{{ wifi_form.ssid.name }}" id="{{ available_wifi.id }}">
+    {{ available_wifi.ssid }} {% if available_wifi.encryption_type %}<i class="fas fa-lock"></i>{% endif %}
+  </button>
+  {% endif %}
+  <input name="{{ wifi_form.ssid.name }}" id="{{ wifi_form.ssid.id_for_label }}" value="{{ available_wifi.ssid }}" maxlength="280" type="hidden">
+  <input name="{{ wifi_form.mac_address.name }}" id="{{ wifi_form.mac_address.id_for_label }}" value="{{ available_wifi.mac_address }}" maxlength="280" type="hidden">
+  <input name="{{ wifi_form.device_name.name }}" id="{{ wifi_form.device_name.id_for_label }}" value="{{ wifi_single.name }}" maxlength="280" type="hidden">
+  <div class="alert alert-secondary hidden_password" id="{{ available_wifi.id }}" style="display: none;">
+    {% if available_wifi.known %}
+    {% if available_wifi.encryption_type %}
+    <p>
+      <label for="{{ wifi_form.password.id_for_label }}">Password:</label>
+      <div class="input-group">
+        <input placeholder="Enter wifi password..." class="wifi_password" name="{{ wifi_form.password.name }}" id="{{ wifi_form.password.id_for_label }}" value="{{ available_wifi.password }}" maxlength="280" type="text">
+      </div>
+    </p>
+    {% else %}
+    <input name="{{ wifi_form.password.name }}" id="{{ wifi_form.password.id_for_label }}" value="{{ available_wifi.password }}" maxlength="280" type="hidden">
+    {% endif %}
+    <div id='no_password' class="alert alert-danger alert-dismissible" style="display: none;">
+      <button type="button" class="close" id="dismiss_alert_text" aria-hidden="true">×</button>
+      <h4><object data="{% static 'icons/ban.svg' %}"></object> Alert!</h4>
+      No password
+    </div>
+    {% else %}
+    {% if available_wifi.encryption_type %}
+    <p>
+      <label for="{{ wifi_form.password.id_for_label }}">Password:</label>
+      <div class="input-group">
+        <input placeholder="Enter wifi password..." class="wifi_password" name="{{ wifi_form.password.name }}" id="{{ wifi_form.password.id_for_label }}" maxlength="280" type="text">
+      </div>
+    </p>
+    {% else %}
+    <input name="{{ wifi_form.password.name }}" id="{{ wifi_form.password.id_for_label }}" value="{{ available_wifi.password }}" maxlength="280" type="hidden">
+    {% endif %}
+    <div id='no_password' class="alert alert-danger alert-dismissible" style="display: none;">
+      <button type="button" class="close" id="dismiss_alert_text" aria-hidden="true">×</button>
+      <h4><object data="{% static 'icons/ban.svg' %}"></object> Alert!</h4>
+      No password
+    </div>
+    {% endif %}
+    <button type="submit" class="btn btn-primary" id="{{ available_wifi.id }}">Save and connect to wifi</button>
+    <button type="button" class="btn btn-danger wifi-cancel" id="{{ available_wifi.id }}">Cancel</button>
+  </div>
+</form>
+{% endfor %}

@@ -1,0 +1,17 @@
+{% load static %}
+
+{% if bluetooth_devices %}
+Press to connect:
+{% endif %}
+<form method="POST" class="post-form">
+  {% csrf_token %}
+  {% for device in bluetooth_devices %}
+  <div class='mb-3 bluetooth-devices'>
+    {% if device.paired %}
+    <button type="button" class="btn btn-success btn-block bluetooth_pair" id="{{ device.id }}" name="{{ device.name }}">{{ device.name }} <i class="fas fa-check"></i></button>
+    {% else %}
+    <button type="button" class="btn btn-primary btn-block bluetooth_pair" id="{{ device.id }}" name="{{ device.name }}">{{ device.name }}</button>
+    {% endif %}
+  </div>
+  {% endfor %}
+</form>

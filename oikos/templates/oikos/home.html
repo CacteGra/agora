@@ -1,0 +1,400 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Meta -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <!-- Web Fonts -->
+  <link href="//fonts.googleapis.com/css?family=Playfair+Display:400,700%7COpen+Sans:300,400,600,700" rel="stylesheet">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="{% static 'stream-ui-kit/vendors/bootstrap/css/bootstrap.min.css' %}">
+  <!-- Components Vendor Styles -->
+  <link rel="stylesheet" type="text/css" href="{% static 'stream-ui-kit/vendors/font-awesome/css/fontawesome-all.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'stream-ui-kit/vendors/slick-carousel/slick.css' %}">
+  <!-- Theme Styles -->
+  <link rel="stylesheet" type="text/css" href="{% static 'stream-ui-kit/css/styles.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'fa-spin.css' %}">
+</head>
+
+<body class="bg-dark">
+<main role="main">
+  <section class="mb-5">
+    <div class="container text-center bg-light u-content-space col-lg-7 col-md-6 u-box-shadow-sm rounded mb-5">
+      <h2 class="h1">Power Off</h2>
+      <form method="POST" action="{% url 'power_off' %}" class="post-form">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success btn-flat"><i class="fas fa-power-off"></i></button>
+      </form>
+    </div>
+    <div class="mb-5">
+    </div>
+    {% if no_user %}
+    <div class="container text-center bg-light u-content-space col-lg-7 col-md-6 u-box-shadow-sm rounded mb-5">
+      <header class="text-center w-md-50 mx-auto mb-3">
+        <h2 class="h1">Set Bluetooth Device</h2>
+      </header>
+      <div class="container mb-3">
+        <form method="POST" action="{% url 'bluetooth_primal_set' %}" class="post-form">
+          {% csrf_token %}
+          {% for device in bluetooth_primals %}
+          <div class='row mb-3 bluetooth-devices'>
+              <div class="col-lg-6 mb-3">
+                {{ device.name }}: {{ device.mac_address }}
+              </div>
+              <input type="hidden" class="mb-3 form-control" value="{{ device.name }}" name="{{ bluetooth_primal_form.name.name }}" id="{{ bluetooth_primal_form.name.id_for_label }}" disabled>
+              <input type="hidden" class="mb-3 form-control" value="{{ device.mac_address }}" name="{{ bluetooth_primal_form.mac_address.name }}" id="{{ bluetooth_primal_form.mac_address.id_for_label }}" disabled>
+              <div class="col-lg-6 mb-3 add-primal-button">
+              <button type="button" class="btn btn-success mb-3 add-primal"><i class="fas fa-plus"></i></button>
+              </div>
+              <div class="col-lg-6 mb-3 primal-setup" style="display: none;">
+              <input placeholder="Enter primal username..." class="mb-3 form-control input-to-enable" name="{{ bluetooth_primal_form.username.name }}" id="{{ bluetooth_primal_form.username.id_for_label }}" maxlength="20" type="text">
+              <input placeholder="Enter primal password..." class="mb-3 form-control input-to-enable" name="{{ bluetooth_primal_form.password.name }}" id="{{ bluetooth_primal_form.password.id_for_label }}" maxlength="20" type="text">
+              <input placeholder="Enter primal email..." class="mb-3 form-control input-to-enable" name="{{ bluetooth_primal_form.email.name }}" id="{{ bluetooth_primal_form.email.id_for_label }}" maxlength="20" type="text">
+              <button type="submit" class="btn btn-success mb-3">Hook up</button>
+              <button type="button" class="btn btn-danger mb-3 primal-cancel">Cancel</button>
+              </div>
+          </div>
+          {% endfor %}
+        </form>
+      </div>
+    </div>
+    {% endif %}
+    <div class="container text-center bg-light u-content-space col-lg-7 col-md-6 u-box-shadow-sm rounded mb-5">
+      <header class="text-center w-md-50 mx-auto mb-3">
+        <h2 class="h1">Wifi</h2>
+      </header>
+      <div class="container">
+        {% for wifi_single in wifi_set %}
+        {% if wifi_single.active %}
+        <div>
+          <form method="POST" action="{% url 'wifi_turn' wifi_single.id %}"  class="post-form">
+            {% csrf_token %}
+            <input type="hidden" name="{{ wifi_device_form.name.name }}" value="{{ wifi_single.name }}" id="{{ wifi_device_form.name.id_for_label }}">
+            <button type="submit" class="btn btn-success mb-3">{{ wifi_single.name }} <i class="fas fa-wifi"></i></button>
+          </form>
+          {% if hotspot %}
+          <form method="POST" action="{% url 'hotspot_turn' wifi_single.id %}"  class="post-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success mb-3">{{ wifi_single.name }} <i class="fas fa-broadcast-tower"></i></button>
+          </form>
+          {% else %}
+          <form method="POST" action="{% url 'hotspot_turn' wifi_single.id %}"  class="post-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary mb-3">{{ wifi_single.name }} <i class="fas fa-broadcast-tower"></i></button>
+          </form>
+          {% endif %}
+        </div>
+        {% if hotspot %}
+        <div class="container" id='wifi_hotspot_set'>
+          <form method="POST" action="{% url 'hotspot_submit' %}" class="post-form">
+            {% csrf_token %}
+            {% if wifi_single.hotspot.name %}
+            <input class="form-control hotspot_name" value="{{ wifi_single.hotspot.name }}" name="{{ hotspot_form.name.name }}" id="{{ hotspot.name.id_for_label }}" maxlength="20" type="text">
+            <input class="form-control hotspot_password" value="{{ wifi_single.hotspot.password }}" name="{{ hotspot_form.password.name }}" id="{{ hotspot_form.password.id_for_label }}" maxlength="20" type="text">
+            {% else %}
+            <input placeholder="Enter hotspot name..." class="form-control hotspot_name" value="{{ wifi_single.hotspot.name }}" name="{{ hotspot_form.name.name }}" id="{{ hotspot.name.id_for_label }}" maxlength="20" type="text">
+            <input placeholder="Enter hotspot password..." class="form-control hotspot_password" value="{{ wifi_single.hotspot.password }}" name="{{ hotspot_form.password.name }}" id="{{ hotspot_form.password.id_for_label }}" maxlength="20" type="text">
+            {% endif %}
+            <div id='hotspot_password_alert' class="alert alert-danger alert-dismissible" style="display: none;">
+              <button type="button" class="close" id="dismiss_alert_text" aria-hidden="true">×</button>
+              <h4><object data="{% static 'icons/ban.svg' %}"></object> Alert!</h4>
+              No password
+            </div>
+            Activate {{ wifi_single.hotspot.name }} on boot?
+            {{ hotspot_form.on_boot }}
+            <button type="submit" class="btn btn-primary hotspot_submit" id="{{ wifi_single.mac_address }}">Save hotspot name and password</button>
+            <button type="cancel" class="btn btn-danger hotspot_cancel" id="{{ wifi_single.mac_address }}">Cancel</button>
+          </form>
+        </div>
+        {% endif %}
+        <form method="POST" class="post-form">
+          {% csrf_token %}
+          <div class="scanning-wifi">
+          <button type="button" class="btn btn-success mb-3 wifi-scan" id="{{ wifi_single.id }}">scan <i class="fas fa-wifi fa-rotate-90"></i></button>
+          </div>
+        </form>
+        <button type="button" class="btn btn-success mb-3 wifi_set_manual" id="{{ wifi_single.id }}"><i class="fas fa-plus"></i></button>
+        <div class="alert alert-secondary wifi_manual" style="display: none;">
+          <form method="POST" class="post-form">
+            {% csrf_token %}
+            <input placeholder="Enter wifi name..." class="form-control wifi_manual_name" name="{{ wifi_form.ssid.name }}" id="{{ wifi_form.ssid.id_for_label }}" maxlength="20" type="text">
+            <div id='wifi_manual_name_alert' class="alert alert-danger alert-dismissible" style="display: none;">
+              <button type="button" class="close" id="dismiss_alert_text" aria-hidden="true">×</button>
+              <h4><i class="icon fa fa-ban"></i> Alert!</h4>
+              No SSID
+            </div>
+            <input placeholder="Enter wifi password..." class="form-control wifi_manual_password" name="{{ wifi_form.password.name }}" id="{{ wifi_form.password.id_for_label }}" maxlength="280" type="text">
+            <div id='wifi_manual_password_alert' class="alert alert-danger alert-dismissible" style="display: none;">
+              <button type="button" class="close" id="dismiss_alert_text" aria-hidden="true">×</button>
+              <h4><object data="{% static 'icons/ban.svg' %}"></object> Alert!</h4>
+              No password
+            </div>
+            <button type="submit" class="btn btn-primary wifi_manual_submit" id="{{ wifi_form.ssid.name }}">Save and connect to wifi</button>
+            <button type="cancel" class="btn btn-danger wifi_manual_cancel" id="{{ wifi_form.ssid.name }}">Cancel</button>
+          </form>
+        </div>
+        <div class="all_wifi">
+          <div class="mb-3">
+            {% if available_wifis %}
+            Press wifi to connect:
+          </div>
+          {% for available_wifi in available_wifis %}
+          <form role="form" method="POST" action="{% url 'wifi_connect'  %}" class="post-form">
+            {% csrf_token %}
+            {% if available_wifi.connected %}
+            <button type="button" class="btn btn-success btn-lg mb-3 wifi_button" name="{{ wifi_form.ssid.name }}" id="{{ available_wifi.id }}">
+              {{ available_wifi.ssid }} {% if available_wifi.encryption_type %}<i class="fas fa-lock"></i>{% endif %}
+            </button>
+            {% elif available_wifi.known %}
+            <button type="button" class="btn btn-secondary btn-lg mb-3 wifi_button" name="{{ wifi_form.ssid.name }}" id="{{ available_wifi.id }}">
+              {{ available_wifi.ssid }} {% if available_wifi.encryption_type %}<i class="fas fa-lock"></i>{% endif %}
+            </button>
+            {% else %}
+            <button type="button" class="btn btn-primary btn-lg mb-3 wifi_button" name="{{ wifi_form.ssid.name }}" id="{{ available_wifi.id }}">
+              {{ available_wifi.ssid }} {% if available_wifi.encryption_type %}<i class="fas fa-lock"></i>{% endif %}
+            </button>
+            {% endif %}
+            <input name="{{ wifi_form.ssid.name }}" id="{{ wifi_form.ssid.id_for_label }}" value="{{ available_wifi.ssid }}" maxlength="280" type="hidden">
+            <input name="{{ wifi_form.mac_address.name }}" id="{{ wifi_form.mac_address.id_for_label }}" value="{{ available_wifi.mac_address }}" maxlength="280" type="hidden">
+            <input name="{{ wifi_form.device_name.name }}" id="{{ wifi_form.device_name.id_for_label }}" value="{{ wifi_single.name }}" maxlength="280" type="hidden">
+            <div class="alert alert-secondary hidden_password" id="{{ available_wifi.id }}" style="display: none;">
+              {% if available_wifi.known %}
+              {% if available_wifi.encryption_type %}
+              <p>
+                <label for="{{ wifi_form.password.id_for_label }}">Password:</label>
+                <div class="input-group">
+                  <input placeholder="Enter wifi password..." class="wifi_password" name="{{ wifi_form.password.name }}" id="{{ wifi_form.password.id_for_label }}" value="{{ available_wifi.password }}" maxlength="280" type="text">
+                </div>
+              </p>
+              {% else %}
+              <input name="{{ wifi_form.password.name }}" id="{{ wifi_form.password.id_for_label }}" value="{{ available_wifi.password }}" maxlength="280" type="hidden">
+              {% endif %}
+              <div id='no_password' class="alert alert-danger alert-dismissible" style="display: none;">
+                <button type="button" class="close" id="dismiss_alert_text" aria-hidden="true">×</button>
+                <h4><object data="{% static 'icons/ban.svg' %}"></object> Alert!</h4>
+                No password
+              </div>
+              {% else %}
+              {% if available_wifi.encryption_type %}
+              <p>
+                <label for="{{ wifi_form.password.id_for_label }}">Password:</label>
+                <div class="input-group">
+                  <input placeholder="Enter wifi password..." class="wifi_password" name="{{ wifi_form.password.name }}" id="{{ wifi_form.password.id_for_label }}" maxlength="280" type="text">
+                </div>
+              </p>
+              {% else %}
+              <input name="{{ wifi_form.password.name }}" id="{{ wifi_form.password.id_for_label }}" value="{{ available_wifi.password }}" maxlength="280" type="hidden">
+              {% endif %}
+              <div id='no_password' class="alert alert-danger alert-dismissible" style="display: none;">
+                <button type="button" class="close" id="dismiss_alert_text" aria-hidden="true">×</button>
+                <h4><object data="{% static 'icons/ban.svg' %}"></object> Alert!</h4>
+                No password
+              </div>
+              Activate {{  available_wifi.ssid }} on boot?
+              {{ wifi_form.on_boot }}
+              {% endif %}
+              <button type="submit" class="btn btn-primary" id="{{ available_wifi.id }}">Save and connect to wifi</button>
+              <button type="button" class="btn btn-danger wifi-cancel" id="{{ available_wifi.id }}">Cancel</button>
+            </div>
+          </form>
+          {% endfor %}
+          {% endif %}
+        </div>
+        {% else %}
+        {% for wifi_device in wifi_devices %}
+        <button type="button" class="btn btn-primary wifi_hotspot" id="{{ wifi_device.mac_address }}"><object data="{% static 'icons/spot-off.svg' %}">{{ wifi_device.name }}</object></button>
+        <button type="button" class="btn btn-primary wifi_hotspot" id="wifi_hotspot"><object data="{% static 'icons/hot-spot-off.svg' %}"></object></button>
+        {% endfor %}
+        <form method="POST" action="{% url 'wifi_turn' wifi_single.id %}"  class="post-form">
+          {% csrf_token %}
+          <input type="hidden" name="{{ wifi_device_form.name.name }}" value="{{ wifi_single.name }}" id="{{ wifi_device_form.name.id_for_label }}">
+          <button type="submit" class="btn btn-primary mb-3">{{ wifi_single.name }} <i class="fas fa-wifi"></i></button>
+        </form>
+        <form method="POST" action="{% url 'hotspot_turn' wifi_single.id %}"  class="post-form">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary mb-3">{{ wifi_single.name }} <i class="fas fa-broadcast-tower"></i></button>
+        </form>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% for bluetooth in bluetooths %}
+    {% if bluetooth.powered %}
+    <div class="container text-center bg-light u-content-space col-lg-7 col-md-6 u-box-shadow-sm rounded mb-5">
+      <form method="POST" action="{% url 'bluetooth_turn' bluetooth.id %}"  class="post-form">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success btn-flat mb-3"><i class="fab fa-bluetooth-b"></i></button>
+      </form>
+      <form method="POST" class="post-form scanning-bluetooth">
+        {% csrf_token %}
+        <button type="button" class="btn btn-success btn-fla mb-3 bluetooth-scan" id="{{ bluetooth.id }}"><i class="fas fa-wifi fa-rotate-90"></i></button>
+      </form>
+      <div class="all_bluetooth">
+      {% if bluetooth_devices %}
+      Press to connect:
+      {% endif %}
+      <form method="POST" class="post-form">
+        {% csrf_token %}
+        {% for device in bluetooth_devices %}
+        <div class='mb-3 bluetooth-devices'>
+          {% if device.paired %}
+          <button type="button" class="btn btn-success btn-block bluetooth_pair" id="{{ device.id }}" name="{{ device.name }}">{{ device.name }} <i class="fas fa-check"></i></button>
+          {% else %}
+          <button type="button" class="btn btn-primary btn-block bluetooth_pair" id="{{ device.id }}" name="{{ device.name }}">{{ device.name }}</button>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </form>
+      </div>
+    {% else %}
+    <form method="POST" action="{% url 'bluetooth_turn' bluetooth.id %}"  class="post-form">
+      {% csrf_token %}
+      <button type="button" class="btn btn-primary btn-flat"><i class="fab fa-bluetooth-b"></i></button>
+    </form>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </section>
+</main>
+</body>
+
+<!-- JAVASCRIPTS (Load javascripts at bottom, this will reduce page load time) -->
+<!-- Global Vendor -->
+<script src="{% static 'stream-ui-kit/vendors/jquery.min.js' %}"></script>
+<script src="{% static 'stream-ui-kit/vendors/jquery.migrate.min.js' %}"></script>
+<script src="{% static 'stream-ui-kit/vendors/popper.min.js' %}"></script>
+<script src="{% static 'stream-ui-kit/vendors/bootstrap/js/bootstrap.min.js' %}"></script>
+
+<!-- Theme Settings and Calls -->
+<script src="{% static 'stream-ui-kit/js/global.js' %}"></script>
+<!-- END JAVASCRIPTS -->
+<script>
+$( document ).ready(function() {
+
+$(".add-primal").click(function () {
+  if($(this).closest('.bluetooth-devices').find(".primal-setup").css('display') == 'none') {
+    $(this).closest('.bluetooth-devices').find(".primal-setup").show();
+    $(this).closest('.bluetooth-devices').find(".add-primal-button").hide();
+  }
+  else {
+    $(this).closest('.bluetooth-devices').find(".primal-setup").hide();
+  }
+})
+
+$(".primal-cancel").click(function () {
+  $(this).closest('.bluetooth-devices').find(".primal-setup").hide();
+  $(this).closest('.bluetooth-devices').find(".add-primal-button").show();
+  $('input.input-to-enable').each(function(curIdx, curO) {
+      $(curO).attr('default-value', $(curO).val());
+});
+})
+
+  $(".scanning-wifi").on('click', ".wifi-scan", function () {
+    var id = $(this).attr('id');
+    $('.wifi-scan').replaceWith('<button type="button" class="btn btn-success mb-3 wifi-scan" id="' + id + '">scan <i class="fa fa-1x fa-cog fa-spin"></i></button>');
+    $.ajax({
+      url: "{% url 'wifi_scan' %}",
+      data: { 'id' : id },
+      type:'POST',
+      beforeSend: function(xhr) {
+          xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+      },
+      success: function(response){
+        $('.wifi-scan').replaceWith('<button type="button" class="btn btn-success mb-3 wifi-scan" id="' + id + '">scan <i class="fas fa-wifi fa-rotate-90"></i></button>');
+        $('.all_wifi').html(response);
+      }
+    });
+  });
+
+  $( "#wifi_set_manual" ).click(function( event ) {
+    $('.wifi_manual').show();
+  })
+
+  $( "#wifi_hotspot" ).click(function( event ) {
+    $('.wifi_hotspot_set').show();
+
+  })
+
+  $( ".wifi_manual_submit" ).submit(function( event ) {
+    if ($(".wifi_manual_name").val() === '') {
+      $('.wifi_manual_name_alert').show();
+    }
+    else {
+      $('.wifi_manual_name_alert').hide();
+    }
+    if ($(".wifi_manual_password").val() === '') {
+      $('.wifi_manual_password_alert').show();
+    }
+    else {
+      $('.wifi_manual_password_alert').hide();
+    }
+  })
+
+  $( ".all_wifi" ).on("click", ".wifi_button", function() {
+    $('.hidden_password').hide();
+    $(this).closest('.post-form').find(".hidden_password").show();
+  })
+
+  $(".hotspot_submit").submit(function( event ) {
+    var id = $(this).attr('id');
+    if (id === '') {
+      $('#hotspot_password_alert').show();
+    }
+    else {
+      $('#hotspot_password_alert').hide();
+    }
+  })
+
+  $( ".all_wifi" ).on("click", ".wifi-cancel", function() {
+      $('.hidden_password').hide();
+  })
+
+  $(".scanning-bluetooth").on('click', ".bluetooth-scan", function () {
+    var id = $(this).attr('id');
+    $('.bluetooth-scan').replaceWith('<button type="button" class="btn btn-success mb-3 bluetooth-scan" id="' + id + '">scan <i class="fa fa-1x fa-cog fa-spin"></i></button>');
+    $.ajax({
+      url: "{% url 'bluetooth_scan' %}",
+      data: { 'id' : id },
+      type:'POST',
+      beforeSend: function(xhr) {
+          xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+      },
+      success: function(response){
+        $('.bluetooth-scan').replaceWith('<button type="button" class="btn btn-success mb-3 bluetooth-scan" id="' + id + '">scan <i class="fas fa-wifi fa-rotate-90"></i></button>');
+        $('.all_bluetooth').html(response);
+      }
+    });
+  });
+
+  $(".all_bluetooth").on("click", ".bluetooth_pair", function () {
+    var id = $(this).attr('id');
+    var name = $(this).attr('name');
+    $(this).replaceWith('<button type="button" class="btn btn-success btn-block bluetooth_pair" id="' + id + '" name="' + name + '">' + name + ' <i class="fa fa-1x fa-cog fa-spin"></i></button>');
+    $.ajax({
+      url: "{% url 'bluetooth_pair' %}",
+      data: { 'id' : id },
+      type:'POST',
+      beforeSend: function(xhr) {
+          xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+      },
+      success: function(response){
+        alert(".bluetooth_pair#" + id);
+        if (response.is_paired === 'true') {
+          $(".bluetooth_pair#" + id).replaceWith('<button type="button" class="btn btn-success btn-block bluetooth_pair" id="' + id + '" name="' + name + '">' + name + ' <i class="fas fa-check"></i></button>');
+        }
+        else {
+          $(".bluetooth_pair#" + id).replaceWith('<button type="button" class="btn btn-primary btn-block bluetooth_pair" id="' + id + '" name="' + name + '">' + name + '</button>');
+        }
+      }
+    })
+  })
+
+});
+</script>
+
+</html>
