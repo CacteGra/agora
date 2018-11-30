@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from pytz import utc
 from subprocess import Popen, PIPE
 
-from .bluetoothctl_pair import Bluetoothctl
+from bluetoothctl.bluetoothctl import Bluetoothctl
 
 from django.db.models import Q
 

@@ -1,0 +1,3 @@
+[submodule "oikos/bluetooth_tools/bluetoothctl"]
+	path = oikos/bluetooth_tools/bluetoothctl
+	url = https://gist.github.com/CacteGra/be4304ac9513f049bebac74ccfc4c9ce
