@@ -4,7 +4,6 @@ def home(request):
     from datetime import datetime
     zero_now = datetime.now()
     first_now = datetime.now()
-    print(datetime.now())
     from os import popen, getcwd
     from subprocess import Popen, PIPE
     from re import search
@@ -21,8 +20,8 @@ def home(request):
     for widi_device in widi_devices:
         print(widi_device.name)
     then_now = datetime.now() - first_now
-    print("this is the difference {}".format(then_now))
-    print("{} {}minutes ".format(then_now.days, then_now.seconds))
+    first_now = datetime.now()
+    print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
     bluetooth_active = popen('systemctl is-active bluetooth').read()
     if bluetooth_active.replace('\n', '') == 'active':
         bluetooth = True
@@ -61,8 +60,8 @@ def home(request):
         else:
             no_user = False
     then_now = datetime.now() - first_now
-
-    print("{} {}minutes ".format(then_now.days, then_now.seconds))
+    first_now = datetime.now()
+    print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
     available_interfaces = popen("ip -br addr show | awk '{print $1}'").read()
     print('back')
     ifconfig = popen('ifconfig').read()
@@ -96,13 +95,14 @@ def home(request):
             print(available_interface)
             wifi_device, created = WifiDevice.objects.get_or_create(name=available_interface)
             wifi_device.active = False
+            active_wifi.connected = False
             wifi_device.save()
-        if wifi_device and ('inet' not in popen('ifconfig {}'.format(available_interface)).read()):
+        if not wifi_device and ('inet' not in popen('ifconfig {}'.format(available_interface)).read()):
             print('removing interface')
             Wifi.objects.filter(wifi_device=wifi_device).update(connected=False)
     then_now = datetime.now() - first_now
-
-    print("{} {}minutes ".format(then_now.days, then_now.seconds))
+    first_now = datetime.now()
+    print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
     print('going')
     print(popen('ifconfig').read())
     wifi_set = WifiDevice.objects.all()
@@ -123,12 +123,10 @@ def home(request):
     print('gone')
     print(popen('ifconfig').read())
     print('corrosive')
-    print(datetime.now())
     print(hotspot)
-    print(datetime.now())
     then_now = datetime.now() - first_now
-
-    print("{} {}minutes ".format(then_now.days, then_now.seconds))
+    first_now = datetime.now()
+    print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
     bluetooths = BluetoothDevice.objects.filter(powered=True)
     print('bluetooths')
     print(bluetooths)
@@ -137,8 +135,8 @@ def home(request):
     for available_wifi in available_wifis:
         print(available_wifi.ssid)
     then_now = datetime.now() - first_now
-
-    print("{} {}minutes ".format(then_now.days, then_now.seconds))
+    first_now = datetime.now()
+    print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
     wifi_device_form = WifiDeviceForm(request.POST)
     wifi_form = WifiForm(request.POST)
     hotspot_form = HotspotForm(request.POST)
@@ -148,10 +146,9 @@ def home(request):
     bluetooth_form = BluetoothForm(request.POST)
     print(wifi_form)
     then_now = datetime.now() - first_now
-    print("{} {}minutes ".format(then_now.days, then_now.seconds))
+    print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
     then_zero = datetime.now() - zero_now
-    print("first to last {} {} minutes ".format(then_zero.days, then_zero.seconds // 3600))
-    print(datetime.now())
+    print("{} {}minutes ".format(then_zero.days, then_zero.seconds // 3600))
     return render(request, 'oikos/home.html', {'no_user': no_user, 'miband_users': miband_users, 'mibands': mibands, 'miband_form': miband_form, 'wifi_set': wifi_set, 'available_wifis': available_wifis, 'bluetooth': bluetooth, 'bluetooths': bluetooths, 'bluetooth_primals': bluetooth_primals, 'bluetooth_primals_form': bluetooth_primals_form, 'bluetooth_devices': bluetooth_devices, 'wifi_device_form': wifi_device_form, 'hotspot': hotspot, 'hotspot_form': hotspot_form, 'wifi_form': wifi_form, 'power_form': power_form})
 
 def wifi_turn(request, wifi_device_id):
@@ -438,4 +435,3 @@ def power_off(request):
         popen('halt')
 
     return HttpResponseRedirect('/')
-
