@@ -36,7 +36,7 @@ def delete_hotspot(id):
         dhcpcd = f.readlines()
     popen('sudo ifconfig {} down'.format(the_hotspot.wifi_device.name))
     print('brought wlan0 down')
-    with open(getcwd() + 'oikos/hotspot/dhcpcd.conf', 'w') as f:
+    with open(getcwd() + '/oikos/hotspot/dhcpcd.conf', 'w') as f:
         wifi_list = []
         for line in dhcpcd:
             if the_hotspot.wifi_device.name in line:
@@ -61,7 +61,7 @@ def delete_hotspot(id):
             else:
                 print(line)
                 f.write(line)
-    new_conf = getcwd() + 'oikos/hotspot/dhcpcd.conf'
+    new_conf = getcwd() + '/oikos/hotspot/dhcpcd.conf'
     default_conf = '/etc/dhcpcd.conf'
     Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE, shell=True)
     popen('sudo systemctl daemon-reload')
@@ -176,4 +176,3 @@ def main(id, change):
         hostapd_boot = Popen(['sudo','hostapd','-B', getcwd() + '/oikos/hotspot/hostapd.conf'], stdout=PIPE, stderr=PIPE)
         the_hotspot.active = True
         the_hotspot.save()
-
