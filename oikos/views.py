@@ -102,8 +102,8 @@ def home(request):
             print(available_interface)
             wifi_device, created = WifiDevice.objects.get_or_create(name=available_interface)
             wifi_device.active = False
-            active_wifi.connected = False
             wifi_device.save()
+            Wifi.objects.all().update(connected=False)
     then_now = datetime.now() - first_now
     first_now = datetime.now()
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
