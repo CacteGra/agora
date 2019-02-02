@@ -398,11 +398,11 @@ def bluetooth_primal_set(request):
     return HttpResponseRedirect('/')
 
 def power_off(request):
-    from os import popen
+    from subprocess import Popen, PIPE
 
     from django.http import HttpResponseRedirect
 
     if request.method == 'POST':
-        popen('halt')
+        Popen(['sudo', 'halt'], stdout=PIPE, stderr=PIPE)
 
     return HttpResponseRedirect('/')
