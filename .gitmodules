@@ -4,6 +4,3 @@
 [submodule "oikos/wifi_tools/panr_agora"]
 	path = oikos/wifi_tools/panr_agora
 	url = https://github.com/CacteGra/panr_agora.git
-[submodule "oikos/wifi_tools/--force"]
-	path = oikos/wifi_tools/--force
-	url = https://github.com/CacteGra/panr_agora.git
