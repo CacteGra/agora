@@ -90,6 +90,15 @@ def home(request):
                     active_wifi = Wifi.objects.get(ssid=ssid)
                     active_wifi.connected = True
                     active_wifi.save()
+                else:
+                    print("is word wlan0")
+                    Wifi.objects.all().update(connected=False)
+            else:
+                print('removing interface')
+                wifi_device, created = WifiDevice.objects.get_or_create(name=available_interface)
+                wifi_device.active = False
+                wifi_device.save()
+                Wifi.objects.all().update(connected=False)
         elif ('wlan' in available_interface) and (available_interface not in ifconfig):
             print('wlan but not in ifconfig')
             print(available_interface)
@@ -97,9 +106,6 @@ def home(request):
             wifi_device.active = False
             active_wifi.connected = False
             wifi_device.save()
-        if not wifi_device and ('inet' not in popen('ifconfig {}'.format(available_interface)).read()):
-            print('removing interface')
-            Wifi.objects.filter(wifi_device=wifi_device).update(connected=False)
     then_now = datetime.now() - first_now
     first_now = datetime.now()
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
