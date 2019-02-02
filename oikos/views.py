@@ -21,7 +21,7 @@ def home(request):
         print(widi_device.name)
     then_now = datetime.now() - first_now
     first_now = datetime.now()
-    if Bluetooth.objects.filter(powered=True).count() > 0:
+    if BluetoothDevice.objects.filter(powered=True).count() > 0:
         print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
         bluetooth_active = popen('systemctl is-active bluetooth').read()
         if bluetooth_active.replace('\n', '') == 'active':
