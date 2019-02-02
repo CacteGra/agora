@@ -21,44 +21,45 @@ def home(request):
         print(widi_device.name)
     then_now = datetime.now() - first_now
     first_now = datetime.now()
-    print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
-    bluetooth_active = popen('systemctl is-active bluetooth').read()
-    if bluetooth_active.replace('\n', '') == 'active':
-        bluetooth = True
-        if Bluetooth.objects.filter(primal=True).count() == 0:
-            controller = bluetooth_scan.controller_show()
-            bluetooth_device = BluetoothDevice.objects.get(id=controller)
-            bluetooth_scan.main(bluetooth_device_id=controller)
-            print('scan bluetooth')
-            bluetooth_primals = Bluetooth.objects.filter(primal=True,bluetooth_device=bluetooth_device)
-            bluetooth_devices = Bluetooth.objects.filter(available=True,bluetooth_device=bluetooth_device)
+    if Bluetooth.objects.filter(powered=True).count() > 0:
+        print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
+        bluetooth_active = popen('systemctl is-active bluetooth').read()
+        if bluetooth_active.replace('\n', '') == 'active':
+            bluetooth = True
+            if Bluetooth.objects.filter(primal=True).count() == 0:
+                controller = bluetooth_scan.controller_show()
+                bluetooth_device = BluetoothDevice.objects.get(id=controller)
+                bluetooth_scan.main(bluetooth_device_id=controller)
+                print('scan bluetooth')
+                bluetooth_primals = Bluetooth.objects.filter(primal=True,bluetooth_device=bluetooth_device)
+                bluetooth_devices = Bluetooth.objects.filter(available=True,bluetooth_device=bluetooth_device)
+            else:
+                bluetooth_devices = Bluetooth.objects.filter(available=True,bluetooth_device=bluetooth_device)
+                bluetooth_primals = None
+            if bluetooth_primals.count() == 0:
+                bluetooth_primals = Bluetooth.objects.filter(name='G5',bluetooth_device=bluetooth_device)
+            miband_users =  Miband.objects.filter(active=True)
+            if miband_users.count() == 0:
+                no_user = True
+                mibands = Bluetooth.objects.filter(name='MI Band 2',available=True)
+            else:
+                no_user = False
         else:
-            bluetooth_devices = Bluetooth.objects.filter(available=True,bluetooth_device=bluetooth_device)
-            bluetooth_primals = None
-        if bluetooth_primals.count() == 0:
-            bluetooth_primals = Bluetooth.objects.filter(name='G5',bluetooth_device=bluetooth_device)
-        miband_users =  Miband.objects.filter(active=True)
-        if miband_users.count() == 0:
-            no_user = True
-            mibands = Bluetooth.objects.filter(name='MI Band 2',available=True)
-        else:
-            no_user = False
-    else:
-        bluetooth = False
-        if Bluetooth.objects.filter(primal=True).count() == 0:
-            bluetooth_scan.turn_on()
-            controller = bluetooth_scan.controller_show()
-            bluetooth_device = BluetoothDevice.objects.get(id=controller)
-            bluetooth_scan.main(bluetooth_device_id=controller)
-            print('scan bluetooth')
-            bluetooth_devices = Bluetooth.objects.filter(available=True,bluetooth_device=bluetooth_device)
-            bluetooth_primals = Bluetooth.objects.filter(primal=True,bluetooth_device=bluetooth_device)
-        miband_users =  Miband.objects.filter(active=True)
-        if miband_users.count() == 0:
-            no_user = True
-            mibands = Bluetooth.objects.filter(name='MI Band 2',available=True)
-        else:
-            no_user = False
+            bluetooth = False
+            if Bluetooth.objects.filter(primal=True).count() == 0:
+                bluetooth_scan.turn_on()
+                controller = bluetooth_scan.controller_show()
+                bluetooth_device = BluetoothDevice.objects.get(id=controller)
+                bluetooth_scan.main(bluetooth_device_id=controller)
+                print('scan bluetooth')
+                bluetooth_devices = Bluetooth.objects.filter(available=True,bluetooth_device=bluetooth_device)
+                bluetooth_primals = Bluetooth.objects.filter(primal=True,bluetooth_device=bluetooth_device)
+            miband_users =  Miband.objects.filter(active=True)
+            if miband_users.count() == 0:
+                no_user = True
+                mibands = Bluetooth.objects.filter(name='MI Band 2',available=True)
+            else:
+                no_user = False
     then_now = datetime.now() - first_now
     first_now = datetime.now()
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
