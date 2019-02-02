@@ -1,5 +1,5 @@
 from django import forms
-from .models import WifiDevice, Wifi, Hotspot, PowerOff, Miband, Bluetooth
+from .models import WifiDevice, Wifi, Hotspot, PowerOff, Bluetooth
 
 class WifiDeviceForm(forms.ModelForm):
     class Meta:
@@ -30,11 +30,6 @@ class PowerOffForm(forms.ModelForm):
     class Meta:
         model = PowerOff
         fields = ['shutdown']
-
-class MibandForm(forms.ModelForm):
-    class Meta:
-        model = Miband
-        fields = ['username','mac_address']
 
 class BluetoothPrimalForm(forms.ModelForm):
     class Meta:

@@ -13,9 +13,9 @@ def home(request):
     from django.shortcuts import render
     from django.http import HttpResponseRedirect
 
-    from .models import Wifi, WifiDevice, Hotspot, Miband, Bluetooth, BluetoothDevice
+    from .models import Wifi, WifiDevice, Hotspot, Bluetooth, BluetoothDevice
 
-    from .forms import WifiDeviceForm, WifiForm, HotspotForm, PowerOffForm, MibandForm, BluetoothPrimalForm, BluetoothForm
+    from .forms import WifiDeviceForm, WifiForm, HotspotForm, PowerOffForm, BluetoothPrimalForm, BluetoothForm
     widi_devices = WifiDevice.objects.all()
     for widi_device in widi_devices:
         print(widi_device.name)
@@ -25,7 +25,6 @@ def home(request):
         print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
         bluetooth_active = popen('systemctl is-active bluetooth').read()
         if bluetooth_active.replace('\n', '') == 'active':
-            bluetooth = True
             if Bluetooth.objects.filter(primal=True).count() == 0:
                 controller = bluetooth_scan.controller_show()
                 bluetooth_device = BluetoothDevice.objects.get(id=controller)
@@ -38,14 +37,7 @@ def home(request):
                 bluetooth_primals = None
             if bluetooth_primals.count() == 0:
                 bluetooth_primals = Bluetooth.objects.filter(name='G5',bluetooth_device=bluetooth_device)
-            miband_users =  Miband.objects.filter(active=True)
-            if miband_users.count() == 0:
-                no_user = True
-                mibands = Bluetooth.objects.filter(name='MI Band 2',available=True)
-            else:
-                no_user = False
         else:
-            bluetooth = False
             if Bluetooth.objects.filter(primal=True).count() == 0:
                 bluetooth_scan.turn_on()
                 controller = bluetooth_scan.controller_show()
@@ -54,12 +46,9 @@ def home(request):
                 print('scan bluetooth')
                 bluetooth_devices = Bluetooth.objects.filter(available=True,bluetooth_device=bluetooth_device)
                 bluetooth_primals = Bluetooth.objects.filter(primal=True,bluetooth_device=bluetooth_device)
-            miband_users =  Miband.objects.filter(active=True)
-            if miband_users.count() == 0:
-                no_user = True
-                mibands = Bluetooth.objects.filter(name='MI Band 2',available=True)
-            else:
-                no_user = False
+    else:
+        bluetooth_primals = None
+        bluetooth_devices = None
     then_now = datetime.now() - first_now
     first_now = datetime.now()
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
@@ -132,7 +121,7 @@ def home(request):
     then_now = datetime.now() - first_now
     first_now = datetime.now()
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
-    bluetooths = BluetoothDevice.objects.filter(powered=True)
+    bluetooths = BluetoothDevice.objects.all()
     print('bluetooths')
     print(bluetooths)
 
@@ -146,7 +135,6 @@ def home(request):
     wifi_form = WifiForm(request.POST)
     hotspot_form = HotspotForm(request.POST)
     power_form = PowerOffForm(request.POST)
-    miband_form = MibandForm(request.POST)
     bluetooth_primals_form = BluetoothPrimalForm(request.POST)
     bluetooth_form = BluetoothForm(request.POST)
     print(wifi_form)
@@ -154,7 +142,7 @@ def home(request):
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
     then_zero = datetime.now() - zero_now
     print("{} {}minutes ".format(then_zero.days, then_zero.seconds // 3600))
-    return render(request, 'oikos/home.html', {'no_user': no_user, 'miband_users': miband_users, 'mibands': mibands, 'miband_form': miband_form, 'wifi_set': wifi_set, 'available_wifis': available_wifis, 'bluetooth': bluetooth, 'bluetooths': bluetooths, 'bluetooth_primals': bluetooth_primals, 'bluetooth_primals_form': bluetooth_primals_form, 'bluetooth_devices': bluetooth_devices, 'wifi_device_form': wifi_device_form, 'hotspot': hotspot, 'hotspot_form': hotspot_form, 'wifi_form': wifi_form, 'power_form': power_form})
+    return render(request, 'oikos/home.html', {'wifi_set': wifi_set, 'available_wifis': available_wifis, 'bluetooths': bluetooths, 'bluetooth_primals': bluetooth_primals, 'bluetooth_primals_form': bluetooth_primals_form, 'bluetooth_devices': bluetooth_devices, 'wifi_device_form': wifi_device_form, 'hotspot': hotspot, 'hotspot_form': hotspot_form, 'wifi_form': wifi_form, 'power_form': power_form})
 
 def wifi_turn(request, wifi_device_id):
     from subprocess import Popen, PIPE
@@ -386,28 +374,6 @@ def hotspot_submit(request):
             the_hotspot.password = hotspot_form.password
             the_hotspot.save()
             add_hotspot.main(the_hotspot.wifi_device.id, change=True)
-
-    return HttpResponseRedirect('/')
-
-def miband_set(request):
-    from . import check_worker
-
-    from django.http import HttpResponseRedirect
-    from django.contrib.auth.models import User
-
-    from .forms import Miband
-
-    if request.method == 'POST':
-        miband_form = MibandForm(request.POST)
-        if miband_form.is_valid():
-            check_worker.main(miband_form.username)
-            try:
-                User.objects.get(miband_form.username)
-            except User.DoesNotExist:
-                that_user = User.objects.create_user(username=miband_form.username,email='user@huphe.net',password='miband')
-            miband_form.user = that_user
-            miband_form.authenticated = True
-            miband_form.save()
 
     return HttpResponseRedirect('/')
 
