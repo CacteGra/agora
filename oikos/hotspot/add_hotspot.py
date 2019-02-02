@@ -63,7 +63,7 @@ def delete_hotspot(id):
                 f.write(line)
     new_conf = getcwd() + '/oikos/hotspot/dhcpcd.conf'
     default_conf = '/etc/dhcpcd.conf'
-    Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE, shell=True)
+    Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE)
     popen('sudo systemctl daemon-reload')
     popen('sudo systemctl restart dhcpcd')
 
@@ -134,14 +134,14 @@ def main(id, change):
                         f.write(line)
             new_conf = getcwd() + '/oikos/hotspot/hostapd.conf'
             default_conf = '/etc/default/hostapd'
-            Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE, shell=True)
+            Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE)
         with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'w') as hostapd_conf:
             print('writing')
             print(hostapd_sample)
             hostapd_conf.write(hostapd_sample)
         new_conf = getcwd() + '/oikos/hotspot/hostapd.conf'
         default_conf = '/etc/default/hostapd'
-        Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE, shell=True)
+        Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE)
         popen('sudo ifconfig {} down'.format(wifi_device.name))
         with open('/etc/dhcpcd.conf', 'r') as f:
             dhcpcd = f.readlines()
@@ -157,7 +157,7 @@ def main(id, change):
                             f.write(line)
                 new_conf = getcwd() + '/oikos/hotspot/dhcpcd.conf'
                 default_conf = '/etc/dhcpcd.conf'
-                Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE, shell=True)
+                Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE)
             else:
                 if '\n' in dhcpcd[-1]:
                     dhcpcd.append('denyinterfaces ' + wifi_device.name)
@@ -168,7 +168,7 @@ def main(id, change):
                         f.write(line)
                 new_conf = getcwd() + '/oikos/hotspot/dhcpcd.conf'
                 default_conf = '/etc/dhcpcd.conf'
-                Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE, shell=True)
+                Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE)
         popen('sudo systemctl daemon-reload')
         popen('sudo systemctl restart hostapd')
         popen('sudo systemctl restart dhcpcd')

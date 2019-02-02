@@ -66,9 +66,9 @@ def get_local_devices(bl):
 
 def turn_off(bluetooth_device_id):
     print('turning off')
-    Popen(['sudo', 'systemctl', 'disable', 'bluetooth'], stdout=PIPE, stderr=PIPE, shell=True)
-    Popen(['sudo', 'systemctl', 'stop', 'bluetooth'], stdout=PIPE, stderr=PIPE, shell=True)
-    sub_proc = Popen(['sudo', 'systemctl', 'stop', 'panr'], stdout=PIPE, stderr=PIPE, shell=True)
+    Popen(['sudo', 'systemctl', 'disable', 'bluetooth'], stdout=PIPE, stderr=PIPE)
+    Popen(['sudo', 'systemctl', 'stop', 'bluetooth'], stdout=PIPE, stderr=PIPE)
+    sub_proc = Popen(['sudo', 'systemctl', 'stop', 'panr'], stdout=PIPE, stderr=PIPE)
     active_controller, created = BluetoothDevice.objects.get_or_create(id=bluetooth_device_id)
     #There's no way to check if bluetooth agent (interface) is down
     active_controller.powered = False
@@ -76,15 +76,15 @@ def turn_off(bluetooth_device_id):
     Bluetooth.objects.filter(paired=False).delete()
     Bluetooth.objects.all().update(paired=False)
     print('following suit')
-    sub_proc = Popen(['sudo', 'systemctl', 'status', 'bluetooth'], stdout=PIPE, stderr=PIPE, shell=True)
+    sub_proc = Popen(['sudo', 'systemctl', 'status', 'bluetooth'], stdout=PIPE, stderr=PIPE)
     bluetooth_status, errors = sub_proc.communicate()
     print(bluetooth_status)
 
 def turn_on():
-    Popen(['sudo', 'systemctl', 'enable', 'bluetooth'], stdout=PIPE, stderr=PIPE, shell=True)
-    Popen(['sudo', 'systemctl', 'start', 'bluetooth'], stdout=PIPE, stderr=PIPE, shell=True)
-    sub_proc = Popen(['sudo', 'systemctl', 'start', 'panr'], stdout=PIPE, stderr=PIPE, shell=True)
-    sub_proc = Popen(['sudo', 'systemctl', 'status', 'bluetooth'], stdout=PIPE, stderr=PIPE, shell=True)
+    Popen(['sudo', 'systemctl', 'enable', 'bluetooth'], stdout=PIPE, stderr=PIPE)
+    Popen(['sudo', 'systemctl', 'start', 'bluetooth'], stdout=PIPE, stderr=PIPE)
+    sub_proc = Popen(['sudo', 'systemctl', 'start', 'panr'], stdout=PIPE, stderr=PIPE)
+    sub_proc = Popen(['sudo', 'systemctl', 'status', 'bluetooth'], stdout=PIPE, stderr=PIPE)
     bluetooth_status, errors = sub_proc.communicate()
     print(bluetooth_status)
 
@@ -97,4 +97,3 @@ def main(bluetooth_device_id=None):
     print(bluetooth_device_id)
     get_local_devices(bl)
     scan(bl, bluetooth_device_id)
-
