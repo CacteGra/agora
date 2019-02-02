@@ -96,8 +96,6 @@ def home(request):
             else:
                 print('removing interface')
                 wifi_device, created = WifiDevice.objects.get_or_create(name=available_interface)
-                wifi_device.active = False
-                wifi_device.save()
                 Wifi.objects.all().update(connected=False)
         elif ('wlan' in available_interface) and (available_interface not in ifconfig):
             print('wlan but not in ifconfig')
