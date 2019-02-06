@@ -113,6 +113,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# macOs
+.DS_Store
 
 # SQLite database files
 
