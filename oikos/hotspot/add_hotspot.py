@@ -93,7 +93,7 @@ def main(id, change):
         the_hotspot = Hotspot.objects.get(wifi_device=wifi_device,active=True)
         with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
             hostapd = f.read()
-        if wifi_device.name in hostapd and the_hotspot.active and wifi_device.name in check_output(['sudo', 'ifconfig', '-a']):
+        if wifi_device.name in hostapd and the_hotspot.active and wifi_device.name in check_output(['sudo', 'ifconfig', '-a']).decode('utf-8'):
             right_lines = False
             with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
                 hostapd = f.readlines()

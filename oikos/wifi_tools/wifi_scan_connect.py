@@ -42,10 +42,10 @@ def connect(wifi_mac_address,interface_name):
     print(connection_status)
     wifi_device = WifiDevice.objects.get(name=interface_name)
     Wifi.objects.filter(wifi_device=wifi_device).update(connected=False)
-    ifconfig = check_output(['ifconfig', interface_name])
+    ifconfig = check_output(['ifconfig', interface_name]).decode('utf-8')
     while "inet " not in ifconfig:
         sleep(1)
-        ifconfig = check_output(['ifconfig', interface_name])
+        ifconfig = check_output(['ifconfig', interface_name]).decode('utf-8')
     to_connect = Wifi.objects.get(mac_address=wifi_mac_address)
     to_connect.connected = True
     to_connect.available = True
@@ -79,20 +79,20 @@ def delete_wifi(wifi_device):
     Popen(['sudo', 'systemctl', 'stop', 'wpa_supplicant.service'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'disable', 'wpa_supplicant'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'daemon-reload'], stdout=PIPE, stderr=PIPE)
-    dhcpcd_journal = check_output(['sudo', 'journalctl', '-u', 'dhcpcd', '-b'])
+    dhcpcd_journal = check_output(['sudo', 'journalctl', '-u', 'dhcpcd', '-b']).decode('utf-8')
     dhcpcd_count = dhcpcd_journal.count('wlan0: waiting for carrier')
     print('nice shoe1')
     sub_proc = Popen(['sudo', 'systemctl', 'restart', 'dhcpcd'], stdout=PIPE, stderr=PIPE)
     sub_proc = Popen(['sudo', 'systemctl', 'restart', 'networking'], stdout=PIPE, stderr=PIPE)
     print('nice shoe1.5')
-    dhcpcd_journal = check_output(['sudo', 'journalctl', '-u', 'dhcpcd', '-b'])
+    dhcpcd_journal = check_output(['sudo', 'journalctl', '-u', 'dhcpcd', '-b']).decode('utf-8')
     print('nice shoe1.6')
     print('nice shoe1.7')
     dhcpcd_restart_count = dhcpcd_journal.count('wlan0: waiting for carrier')
     print('nice shoe2')
     print(dhcpcd_restart_count)
     print(dhcpcd_count)
-    ifconfig = check_output(['ifconfig'])
+    ifconfig = check_output(['ifconfig']).decode('utf-8')
     if wifi_device in ifconfig:
         while dhcpcd_restart_count == dhcpcd_count:
             sleep(1)
@@ -101,14 +101,14 @@ def delete_wifi(wifi_device):
     print(dhcpcd_restart_count)
     print('nice shoe3')
     sub_proc = Popen(['sudo', 'ifconfig', wifi_device, 'down'], stdout=PIPE, stderr=PIPE)
-    ifconfig = check_output(['ifconfig'])
+    ifconfig = check_output(['ifconfig']).decode('utf-8')
     print(ifconfig)
     print('noel')
     while wifi_device in ifconfig:
         print('while')
         print(wifi_device)
         sleep(0.10)
-        ifconfig = check_output(['ifconfig'])
+        ifconfig = check_output(['ifconfig']).decode('utf-8')
     return True
 
 def main(wifi_device):

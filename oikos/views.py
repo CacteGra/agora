@@ -23,7 +23,7 @@ def home(request):
     first_now = datetime.now()
     if BluetoothDevice.objects.filter(powered=True).count() > 0:
         print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
-        bluetooth_active = check_output(['systemctl', 'is-active', 'bluetooth'])
+        bluetooth_active = check_output(['systemctl', 'is-active', 'bluetooth']).decode('utf-8')
         if bluetooth_active.replace('\n', '') == 'active':
             if Bluetooth.objects.filter(primal=True).count() == 0:
                 controller = bluetooth_scan.controller_show()
@@ -52,9 +52,9 @@ def home(request):
     then_now = datetime.now() - first_now
     first_now = datetime.now()
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
-    available_interfaces = check_output(['ip -br addr show | awk "{print $1}"'])
+    available_interfaces = check_output(['ip -br addr show | awk "{print $1}"']).decode('utf-8')
     print('back')
-    ifconfig = check_output(['ifconfig'])
+    ifconfig = check_output(['ifconfig']).decode('utf-8')
     print(ifconfig)
     for available_interface in available_interfaces.split('\n'):
         wifi_device = None
@@ -63,12 +63,12 @@ def home(request):
             wifi_device, created = WifiDevice.objects.get_or_create(name=available_interface)
             wifi_device.active = True
             wifi_device.save()
-            ifconfig = check_output(['ifconfig', available_interface])
+            ifconfig = check_output(['ifconfig', available_interface]).decode('utf-8')
             print('hello')
             print(ifconfig)
             if "inet " in ifconfig:
                 print("is inet wlan0")
-                iwconfig = check_output(['iwconfig', available_interface])
+                iwconfig = check_output(['iwconfig', available_interface]).decode('utf-8')
                 word = search('ESSID:"(.+?)"', iwconfig)
                 if word and ('Master' not in iwconfig):
                     print("is word wlan0")
@@ -96,7 +96,7 @@ def home(request):
     print('going')
     wifi_set = WifiDevice.objects.all()
     for wifi_s in wifi_set:
-        if ('inet' in check_output(['ifconfig', wifi_s.name])) and ('Master' in check_output(['iwconfig', wifi_s.name])):
+        if ('inet' in check_output(['ifconfig', wifi_s.name]).decode('utf-8')) and ('Master' in check_output(['iwconfig', wifi_s.name]).decode('utf-8')):
             with open(getcwd() + "/oikos/hotspot/hostapd.conf", 'r') as f:
                 hostapd_conf = f.read()
             if wifi_s.name in hostapd_conf:
@@ -161,26 +161,26 @@ def wifi_turn(request, wifi_device_id):
             print(wifi_device)
             print(wifi_device.id)
             wifi_device.save()
-            ifconfig = check_output(['ifconfig'])
+            ifconfig = check_output(['ifconfig']).decode('utf-8')
             print(ifconfig)
             if wifi_device.name in ifconfig:
                 print('bringing it down')
-                iwconfig = check_output(['iwconfig', wifi_device.name])
+                iwconfig = check_output(['iwconfig', wifi_device.name]).decode('utf-8')
                 if 'Master' in iwconfig:
                     add_hotspot.delete_hotspot(wifi_device.id)
                 wifi_scan_connect.delete_wifi(wifi_device.name)
                 print(wifi_device.name)
             else:
-                sub_proc = check_output(['sudo', 'ifconfig', wifi_device.name, 'down'])
+                sub_proc = check_output(['sudo', 'ifconfig', wifi_device.name, 'down']).decode('utf-8')
                 add_hotspot.delete_hotspot(wifi_device.id)
                 Hotspot.objects.filter(wifi_device=wifi_device).update(active=False)
                 sub_proc = Popen(['sudo', 'ifconfig', wifi_device.name, 'up'], stdout=PIPE, stderr=PIPE)
-                ifconfig = check_output(['ifconfig'])
+                ifconfig = check_output(['ifconfig']).decode('utf-8')
                 while wifi_device.name not in ifconfig:
                     sleep(0.10)
                     print(wifi_device.name)
                     print(ifconfig)
-                    ifconfig = check_output(['ifconfig'])
+                    ifconfig = check_output(['ifconfig']).decode('utf-8')
                 wifi_scan_connect.main(wifi_device.name)
 
     return HttpResponseRedirect('/')
@@ -327,7 +327,7 @@ def hotspot_turn(request, wifi_device_id):
             wifi_device = WifiDevice.objects.get(id=wifi_device_id)
         except WifiDevice.DoesNotExist:
             return HttpResponseRedirect('/')
-        if ('inet' in check_output(['ifconfig', wifi_device.name])) and ('Master' in check_output(['iwconfig', wifi_device.name])) and Hotspot.objects.filter(active=True).count() > 0:
+        if ('inet' in check_output(['ifconfig', wifi_device.name]).decode('utf-8')) and ('Master' in check_output(['iwconfig', wifi_device.name]).decode('utf-8')) and Hotspot.objects.filter(active=True).count() > 0:
             print('deleting')
             Popen(['sudo', 'ifconfig', wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
             add_hotspot.delete_hotspot(wifi_device.id)
