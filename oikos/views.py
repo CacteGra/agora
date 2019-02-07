@@ -191,6 +191,8 @@ def wifi_turn(request, wifi_device_id):
                 ifconfig = ifconfig.decode('utf-8')
                 while wifi_device.name not in ifconfig:
                     sleep(0.10)
+                    print(wifi_device.name)
+                    print(ifconfig)
                     sub_proc = Popen(['ifconfig'], stdout=PIPE, stderr=PIPE)
                     ifconfig, errors = sub_proc.communicate()
                     ifconfig = ifconfig.decode('utf-8')

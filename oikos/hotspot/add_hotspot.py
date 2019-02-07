@@ -1,5 +1,4 @@
 from requests import get
-from time import sleep
 from os import getcwd, popen
 from subprocess import Popen, PIPE
 
