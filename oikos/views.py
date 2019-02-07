@@ -4,7 +4,7 @@ def home(request):
     from datetime import datetime
     zero_now = datetime.now()
     first_now = datetime.now()
-    from os import getcwd
+    from os import getcwd, popen
     from subprocess import Popen, PIPE, check_output
     from re import search
 
@@ -52,7 +52,7 @@ def home(request):
     then_now = datetime.now() - first_now
     first_now = datetime.now()
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
-    available_interfaces, errors = Popen(['ip -br addr show | awk "{print $1}"']).communicate()
+    available_interfaces, errors = popen('ip -br addr show | awk "{print $1}"')
     print('back')
     ifconfig = check_output(['ifconfig']).decode('utf-8')
     print(ifconfig)
