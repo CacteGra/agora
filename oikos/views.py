@@ -52,7 +52,7 @@ def home(request):
     then_now = datetime.now() - first_now
     first_now = datetime.now()
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
-    available_interfaces = popen('ip -br addr show | awk "{print $1}"')
+    available_interfaces = popen('ip -br addr show | awk "{print $1}"').read()
     print('back')
     ifconfig = check_output(['ifconfig']).decode('utf-8')
     print(ifconfig)
