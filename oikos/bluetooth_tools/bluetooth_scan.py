@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from pytz import utc
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, check_output
 
 from .bluetoothctl.bluetoothctl import Bluetoothctl
 
@@ -76,16 +76,14 @@ def turn_off(bluetooth_device_id):
     Bluetooth.objects.filter(paired=False).delete()
     Bluetooth.objects.all().update(paired=False)
     print('following suit')
-    sub_proc = Popen(['sudo', 'systemctl', 'status', 'bluetooth'], stdout=PIPE, stderr=PIPE)
-    bluetooth_status, errors = sub_proc.communicate()
+    bluetooth_status = check_output(['sudo', 'systemctl', 'status', 'bluetooth'])
     print(bluetooth_status)
 
 def turn_on():
     Popen(['sudo', 'systemctl', 'enable', 'bluetooth'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'start', 'bluetooth'], stdout=PIPE, stderr=PIPE)
     sub_proc = Popen(['sudo', 'systemctl', 'start', 'panr'], stdout=PIPE, stderr=PIPE)
-    sub_proc = Popen(['sudo', 'systemctl', 'status', 'bluetooth'], stdout=PIPE, stderr=PIPE)
-    bluetooth_status, errors = sub_proc.communicate()
+    bluetooth_status = check_output(['sudo', 'systemctl', 'status', 'bluetooth'])
     print(bluetooth_status)
 
 def main(bluetooth_device_id=None):

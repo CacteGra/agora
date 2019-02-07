@@ -1,6 +1,5 @@
 from requests import get
-from os import getcwd, popen
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, check_output
 
 from oikos.models import WifiDevice, Hotspot
 
@@ -33,7 +32,7 @@ def delete_hotspot(id):
     the_hotspot.save()
     with open('/etc/dhcpcd.conf', 'r') as f:
         dhcpcd = f.readlines()
-    popen('sudo ifconfig {} down'.format(the_hotspot.wifi_device.name))
+    Popen(['sudo', 'ifconfig', the_hotspot.wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
     print('brought wlan0 down')
     with open(getcwd() + '/oikos/hotspot/dhcpcd.conf', 'w') as f:
         wifi_list = []
@@ -54,17 +53,17 @@ def delete_hotspot(id):
                 if wifi_list:
                     line = "denyinterfaces " + (" ").join(wifi_list)
                     f.write(line)
-                    popen('sudo systemctl restart hostapd')
+                    Popen(['sudo', 'systemctl', 'restart', 'hostapd'], stdout=PIPE, stderr=PIPE)
                 else:
-                    popen('sudo systemctl stop hostapd')
+                    Popen(['sudo', 'systemctl', 'stop', 'hostapd'], stdout=PIPE, stderr=PIPE)
             else:
                 print(line)
                 f.write(line)
     new_conf = getcwd() + '/oikos/hotspot/dhcpcd.conf'
     default_conf = '/etc/dhcpcd.conf'
     Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE)
-    popen('sudo systemctl daemon-reload')
-    popen('sudo systemctl restart dhcpcd')
+    Popen(['sudo', 'systemctl', 'daemon-reload'], stdout=PIPE, stderr=PIPE)
+    Popen(['sudo', 'systemctl', 'restart dhcpcd'], stdout=PIPE, stderr=PIPE)
 
 def main(id, change):
 
@@ -83,18 +82,18 @@ def main(id, change):
                 else:
                     f.write(line)
         if the_hotspot.on_boot:
-            popen('sudo systemctl restart hostapd')
+            Popen(['sudo', 'systemctl', 'restart', 'hostapd'], stdout=PIPE, stderr=PIPE)
         else:
-            Popen(['hostapd','-B', getcwd() + '/oikos/hotspot/hostapd.conf'], stdout=PIPE, stderr=PIPE)
-        popen('sudo ifconfig {} down'.format(the_hotspot.wifi_device.name))
-        popen('sudo ifconfig {} up'.format(the_hotspot.wifi_device.name))
+            Popen(['hostapd', '-B', getcwd() + '/oikos/hotspot/hostapd.conf'], stdout=PIPE, stderr=PIPE)
+        Popen(['sudo', 'ifconfig', the_hotspot.wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
+        Popen(['sudo', 'ifconfig', the_hotspot.wifi_device.name, 'up'], stdout=PIPE, stderr=PIPE)
         return True
     try:
         print('in the try')
         the_hotspot = Hotspot.objects.get(wifi_device=wifi_device,active=True)
         with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
             hostapd = f.read()
-        if wifi_device.name in hostapd and the_hotspot.active and wifi_device.name in popen('sudo ifconfig -a').read():
+        if wifi_device.name in hostapd and the_hotspot.active and wifi_device.name in check_output(['sudo', 'ifconfig', '-a']):
             right_lines = False
             with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
                 hostapd = f.readlines()
@@ -141,7 +140,7 @@ def main(id, change):
         new_conf = getcwd() + '/oikos/hotspot/hostapd.conf'
         default_conf = '/etc/default/hostapd'
         Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE)
-        popen('sudo ifconfig {} down'.format(wifi_device.name))
+        Popen(['sudo', 'ifconfig', wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
         with open('/etc/dhcpcd.conf', 'r') as f:
             dhcpcd = f.readlines()
         print(dhcpcd)
@@ -168,10 +167,10 @@ def main(id, change):
                 new_conf = getcwd() + '/oikos/hotspot/dhcpcd.conf'
                 default_conf = '/etc/dhcpcd.conf'
                 Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE)
-        popen('sudo systemctl daemon-reload')
-        popen('sudo systemctl restart hostapd')
-        popen('sudo systemctl restart dhcpcd')
-        popen('sudo ifconfig {} up'.format(wifi_device.name))
-        hostapd_boot = Popen(['sudo','hostapd','-B', getcwd() + '/oikos/hotspot/hostapd.conf'], stdout=PIPE, stderr=PIPE)
+        Popen(['sudo', 'systemctl', 'daemon-reload'], stdout=PIPE, stderr=PIPE)
+        Popen(['sudo', 'systemctl', 'restart', 'hostapd'], stdout=PIPE, stderr=PIPE)
+        Popen(['sudo', 'systemctl', 'restart', 'dhcpcd'], stdout=PIPE, stderr=PIPE)
+        Popen(['sudo', 'ifconfig', wifi_device.name, 'up'], stdout=PIPE, stderr=PIPE)
+        hostapd_boot = Popen(['sudo', 'hostapd', '-B', getcwd() + '/oikos/hotspot/hostapd.conf'], stdout=PIPE, stderr=PIPE)
         the_hotspot.active = True
         the_hotspot.save()
