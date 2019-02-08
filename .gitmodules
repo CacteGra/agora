@@ -4,6 +4,3 @@
 [submodule "oikos/wifi_tools/panr_agora"]
 	path = oikos/wifi_tools/panr_agora
 	url = https://github.com/CacteGra/panr_agora.git
-[submodule "agora/static/stream-ui-kit"]
-	path = agora/static/stream-ui-kit
-	url = https://github.com/htmlstreamofficial/stream-ui-kit.git
