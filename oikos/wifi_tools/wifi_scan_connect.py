@@ -69,7 +69,7 @@ def scan_only(wifi_device):
         scanned_wifi.save()
 
 def delete_wifi(wifi_device):
-    from subprocess import Popen, PIPE
+    from subprocess import Popen, PIPE, check_output
     from time import sleep
 
     with open('/etc/wpa_supplicant/wpa_supplicant.conf', 'w') as f:
