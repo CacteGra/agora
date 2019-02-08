@@ -8,7 +8,7 @@ def get_wifi(wifi_device):
     return sorted(list(Cell.all(wifi_device)), key=lambda x: x.signal)
 
 def connect(wifi_mac_address,interface_name):
-    from os import popen, stat, getcwd
+    from os import stat, getcwd
     from subprocess import Popen, PIPE, check_output
     from time import sleep
 

@@ -139,7 +139,7 @@ def home(request):
     return render(request, 'oikos/home.html', {'wifi_set': wifi_set, 'available_wifis': available_wifis, 'bluetooths': bluetooths, 'bluetooth_primals': bluetooth_primals, 'bluetooth_primals_form': bluetooth_primals_form, 'bluetooth_devices': bluetooth_devices, 'wifi_device_form': wifi_device_form, 'hotspot': hotspot, 'hotspot_form': hotspot_form, 'wifi_form': wifi_form, 'power_form': power_form})
 
 def wifi_turn(request, wifi_device_id):
-    from subprocess import Popen, PIPE
+    from subprocess import Popen, PIPE, check_output
     from time import sleep
 
     from .wifi_tools import wifi_scan_connect
@@ -312,7 +312,7 @@ def bluetooth_pair(request):
 
 def hotspot_turn(request, wifi_device_id):
     from os import getcwd
-    from subprocess import Popen, PIPE
+    from subprocess import Popen, PIPE, check_output
 
     from django.http import HttpResponseRedirect
 
