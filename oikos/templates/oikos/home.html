@@ -232,7 +232,7 @@
       </form>
       <form method="POST" class="post-form scanning-bluetooth">
         {% csrf_token %}
-        <button type="button" class="btn btn-success btn-fla mb-3 bluetooth-scan" id="{{ bluetooth.id }}"><i class="fas fa-wifi fa-rotate-90"></i></button>
+        <button type="button" class="btn btn-success btn-fla mb-3 bluetooth-scan" id="{{ bluetooth.id }}">scan<i class="fas fa-wifi fa-rotate-90"></i></button>
       </form>
       <div class="all_bluetooth">
       {% if bluetooth_devices %}

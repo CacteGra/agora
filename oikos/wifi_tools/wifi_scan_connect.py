@@ -54,6 +54,9 @@ def connect(wifi_mac_address,interface_name):
 
 def scan_only(wifi_device):
     m = get_wifi(wifi_device)
+    if not m:
+        from subprocess import Popen, PIPE
+        Popen(['sudo', 'iwlist', 'wlan0', 'scanning', '|', 'grep' 'ESSID'], stdout=PIPE, stderr=PIPE)
     for cell in m:
         a = Wifi.objects.filter(mac_address=cell.address)
         for i in a:
@@ -113,6 +116,11 @@ def delete_wifi(wifi_device):
 
 def main(wifi_device):
     m = get_wifi(wifi_device)
+    if not m:
+        from subprocess import check_output
+        check_output(['sudo', 'wifi', 'scan'])
+        # this is a workaround to get python-wifi as it cannot work firsthand without using sudo for the first time
+        m = get_wifi(wifi_device)
     with open('/etc/wpa_supplicant/wpa_supplicant.conf', 'w') as f:
         pass
     for cell in m:
