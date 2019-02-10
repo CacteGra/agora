@@ -15,7 +15,7 @@ def home(request):
 
     from .models import Wifi, WifiDevice, Hotspot, Bluetooth, BluetoothDevice
 
-    from .forms import WifiDeviceForm, WifiForm, HotspotForm, PowerOffForm, BluetoothPrimalForm, BluetoothForm
+    from .forms import WifiDeviceForm, WifiForm, WifiForgetForm, HotspotForm, PowerOffForm, BluetoothPrimalForm, BluetoothForm
     widi_devices = WifiDevice.objects.all()
     for widi_device in widi_devices:
         print(widi_device.name)
