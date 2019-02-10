@@ -56,6 +56,7 @@ def home(request):
     print('back')
     ifconfig = check_output(['ifconfig']).decode('utf-8')
     print(ifconfig)
+    Wifi.objects.all().update(available=False)
     for available_interface in available_interfaces.split('\n'):
         wifi_device = None
         if ('wlan' in available_interface) and (available_interface in ifconfig):
@@ -78,7 +79,7 @@ def home(request):
                     active_wifi.save()
                 else:
                     print("is word wlan0")
-                    Wifi.objects.all().update(connected=False, available=False)
+                    Wifi.objects.all().update(connected=False)
             else:
                 print('removing interface')
                 wifi_device, created = WifiDevice.objects.get_or_create(name=available_interface)
@@ -89,7 +90,7 @@ def home(request):
             wifi_device, created = WifiDevice.objects.get_or_create(name=available_interface)
             wifi_device.active = False
             wifi_device.save()
-            Wifi.objects.all().update(connected=False, available=False)
+            Wifi.objects.all().update(connected=False)
     then_now = datetime.now() - first_now
     first_now = datetime.now()
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
