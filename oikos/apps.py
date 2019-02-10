@@ -5,7 +5,7 @@ class OikosConfig(AppConfig):
     def ready(self):
         from .models import WifiDevice, BluetoothDevice
 
-        powered_bluetooth = Bluetooth.objects.filter(powered=True)
+        powered_bluetooth = BluetoothDevice.objects.filter(powered=True)
         powered_wifi = WifiDevice.objects.filter(active=True)
         if powered_bluetooth.count() == 0 and powered_wifi.count() == 0:
             from .bluetooth_tools import bluetooth_scan
