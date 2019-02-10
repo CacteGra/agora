@@ -56,7 +56,7 @@ def home(request):
     print('back')
     ifconfig = check_output(['ifconfig']).decode('utf-8')
     print(ifconfig)
-    Wifi.objects.all().update(available=False)
+    Wifi.objects.filter(connected=False).update(available=False)
     for available_interface in available_interfaces.split('\n'):
         wifi_device = None
         if ('wlan' in available_interface) and (available_interface in ifconfig):
@@ -128,6 +128,7 @@ def home(request):
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
     wifi_device_form = WifiDeviceForm(request.POST)
     wifi_form = WifiForm(request.POST)
+    wifi_forget_form = WifiForgetForm(request.POST)
     hotspot_form = HotspotForm(request.POST)
     power_form = PowerOffForm(request.POST)
     bluetooth_primals_form = BluetoothPrimalForm(request.POST)
@@ -137,7 +138,7 @@ def home(request):
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
     then_zero = datetime.now() - zero_now
     print("{} {}minutes ".format(then_zero.days, then_zero.seconds // 3600))
-    return render(request, 'oikos/home.html', {'wifi_set': wifi_set, 'available_wifis': available_wifis, 'bluetooths': bluetooths, 'bluetooth_primals': bluetooth_primals, 'bluetooth_primals_form': bluetooth_primals_form, 'bluetooth_devices': bluetooth_devices, 'wifi_device_form': wifi_device_form, 'hotspot': hotspot, 'hotspot_form': hotspot_form, 'wifi_form': wifi_form, 'power_form': power_form})
+    return render(request, 'oikos/home.html', {'wifi_set': wifi_set, 'available_wifis': available_wifis, 'bluetooths': bluetooths, 'bluetooth_primals': bluetooth_primals, 'bluetooth_primals_form': bluetooth_primals_form, 'bluetooth_devices': bluetooth_devices, 'wifi_device_form': wifi_device_form, 'hotspot': hotspot, 'hotspot_form': hotspot_form, 'wifi_form': wifi_form, 'wifi_forget_form':wifi_forget_form, 'power_form': power_form})
 
 def wifi_turn(request, wifi_device_id):
     from subprocess import Popen, PIPE, check_output
@@ -148,7 +149,7 @@ def wifi_turn(request, wifi_device_id):
 
     from django.http import HttpResponseRedirect
 
-    from .models import WifiDevice, Hotspot
+    from .models import WifiDevice, Wifi, Hotspot
     from .forms import WifiDeviceForm
 
     wifi_device_form = WifiDeviceForm(request.POST)
@@ -172,6 +173,7 @@ def wifi_turn(request, wifi_device_id):
                 wifi_scan_connect.delete_wifi(wifi_device.name)
                 print(wifi_device.name)
             else:
+                Wifi.objects.filter(wifi_device.name=wifi_device).update(available=False,connected=False)
                 sub_proc = check_output(['sudo', 'ifconfig', wifi_device.name, 'down']).decode('utf-8')
                 add_hotspot.delete_hotspot(wifi_device.id)
                 Hotspot.objects.filter(wifi_device=wifi_device).update(active=False)
@@ -240,6 +242,21 @@ def wifi_connect(request):
             Popen(['sudo', 'ifconfig', update_wifi.wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
             add_hotspot.delete_hotspot(update_wifi.wifi_device.id)
             wifi_scan_connect.connect(update_wifi.mac_address,wifi_form_wait.device_name)
+
+    return HttpResponseRedirect('/')
+
+def wifi_forget(request):
+    from subprocess import Popen, PIPE
+
+    from .models import Wifi
+
+    from .forms import WifiForgetForm
+
+    if request.method == 'POST':
+        if wifi_forget_form.is_valid():
+            wifi_forget_form_wait = wifi_forget_form.get(Wifi.objects.filter(mac_address=wifi_forget_form.mac_address)).update(known=False,Connected=False,Password=None)
+            wifi_scan_connect.delete_wifi(wifi_device.name)
+            sub_proc = Popen(['sudo', 'ifconfig', wifi_device, 'up'], stdout=PIPE, stderr=PIPE)
 
     return HttpResponseRedirect('/')
 

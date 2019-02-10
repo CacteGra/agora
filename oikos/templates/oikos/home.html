@@ -134,8 +134,15 @@
               <h4><object data="{% static 'icons/ban.svg' %}"></object> Alert!</h4>
               No password
             </div>
+            Activate {{  available_wifi.ssid }} on boot?
+            {{ wifi_form.on_boot }}
             <button type="submit" class="btn btn-primary wifi_manual_submit" id="{{ wifi_form.ssid.name }}">Save and connect to wifi</button>
             <button type="cancel" class="btn btn-danger wifi_manual_cancel" id="{{ wifi_form.ssid.name }}">Cancel</button>
+            {% if available_wifi.known %}
+            <form method="POST" action="{% url 'wifi_forget' %}" class="post-form">
+              <button type="submit" class="btn btn-warning" id="{{ wifi_form.ssid.name }}">Cancel</button>
+            </form>
+            {% endif %}
           </form>
         </div>
         <div class="all_wifi">

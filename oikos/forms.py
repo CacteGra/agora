@@ -17,6 +17,12 @@ class WifiForm(forms.ModelForm):
         device_name = forms.CharField(label='device_name',required=True)
         on_boot = forms.BooleanField(label='on_boot',required=True,widget=forms.CheckboxInput())
 
+class WifiForgetForm(forms.ModelForm):
+    class Meta:
+        model Wifi
+        fields = ['mac_address']
+        forms.CharField(label='mac_address',required=True)
+
 class HotspotForm(forms.ModelForm):
     class Meta:
         model = Hotspot
