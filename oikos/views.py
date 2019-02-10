@@ -173,10 +173,10 @@ def wifi_turn(request, wifi_device_id):
                 wifi_scan_connect.delete_wifi(wifi_device.name)
                 print(wifi_device.name)
             else:
-                Wifi.objects.filter(wifi_device.name=wifi_device).update(available=False,connected=False)
+                Wifi.objects.filter(wifi_device.name=wifi_device.name).update(available=False,connected=False)
                 sub_proc = check_output(['sudo', 'ifconfig', wifi_device.name, 'down']).decode('utf-8')
                 add_hotspot.delete_hotspot(wifi_device.id)
-                Hotspot.objects.filter(wifi_device=wifi_device).update(active=False)
+                Hotspot.objects.filter(wifi_device.name=wifi_device.name).update(active=False)
                 sub_proc = Popen(['sudo', 'ifconfig', wifi_device.name, 'up'], stdout=PIPE, stderr=PIPE)
                 ifconfig = check_output(['ifconfig']).decode('utf-8')
                 while wifi_device.name not in ifconfig:
