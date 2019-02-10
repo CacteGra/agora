@@ -19,7 +19,7 @@ class WifiForm(forms.ModelForm):
 
 class WifiForgetForm(forms.ModelForm):
     class Meta:
-        model Wifi
+        model = Wifi
         fields = ['mac_address']
         forms.CharField(label='mac_address',required=True)
 
