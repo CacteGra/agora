@@ -7,7 +7,7 @@ def get_wifi(wifi_device):
     Wifi.objects.filter(known=False).delete()
     Wifi.objects.all().update(available=False)
     check_output(['sudo', 'wifi', 'scan'])
-    return sorted(list(Cell.all(wifi_device)), key=lambda x: x.signal)
+    return sorted(list(Cell.all(wifi_device)), key=lambda x: x.signal, reverse=True)
 
 def connect(wifi_mac_address,interface_name):
     from os import stat, getcwd
