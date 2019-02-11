@@ -68,7 +68,7 @@ def turn_off(bluetooth_device_id):
     print('turning off')
     Popen(['sudo', 'systemctl', 'disable', 'bluetooth'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'stop', 'bluetooth'], stdout=PIPE, stderr=PIPE)
-    sub_proc = Popen(['sudo', 'systemctl', 'stop', 'panr'], stdout=PIPE, stderr=PIPE)
+    Popen(['sudo', 'systemctl', 'stop', 'panr'], stdout=PIPE, stderr=PIPE)
     active_controller, created = BluetoothDevice.objects.get_or_create(id=bluetooth_device_id)
     #There's no way to check if bluetooth agent (interface) is down
     active_controller.powered = False
@@ -82,7 +82,7 @@ def turn_off(bluetooth_device_id):
 def turn_on():
     Popen(['sudo', 'systemctl', 'enable', 'bluetooth'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'start', 'bluetooth'], stdout=PIPE, stderr=PIPE)
-    sub_proc = Popen(['sudo', 'systemctl', 'start', 'panr'], stdout=PIPE, stderr=PIPE)
+    Popen(['sudo', 'systemctl', 'start', 'panr'], stdout=PIPE, stderr=PIPE)
     bluetooth_status = check_output(['sudo', 'systemctl', 'status', 'bluetooth']).decode('utf-8')
     print(bluetooth_status)
 
