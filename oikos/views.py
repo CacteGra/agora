@@ -138,7 +138,7 @@ def home(request):
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
     then_zero = datetime.now() - zero_now
     print("{} {}minutes ".format(then_zero.days, then_zero.seconds // 3600))
-    return render(request, 'oikos/home.html', {'wifi_set': wifi_set, 'available_wifis': available_wifis, 'bluetooths': bluetooths, 'bluetooth_primals': bluetooth_primals, 'bluetooth_primals_form': bluetooth_primals_form, 'bluetooth_devices': bluetooth_devices, 'wifi_device_form': wifi_device_form, 'hotspot': hotspot, 'hotspot_form': hotspot_form, 'wifi_form': wifi_form, 'wifi_forget_form':wifi_forget_form, 'power_form': power_form})
+    return render(request, 'oikos/home.html', {'wifi_set': wifi_set, 'available_wifis': available_wifis, 'bluetooths': bluetooths, 'bluetooth_primals': bluetooth_primals, 'bluetooth_primals_form': bluetooth_primals_form, 'bluetooth_devices': bluetooth_devices, 'wifi_device_form': wifi_device_form, 'hotspot': hotspot, 'hotspot_form': hotspot_form, 'wifi_form': wifi_form, 'wifi_forget_form': wifi_forget_form, 'power_form': power_form})
 
 def wifi_turn(request, wifi_device_id):
     from subprocess import Popen, PIPE, check_output
@@ -196,7 +196,7 @@ def wifi_scan(request):
     from django.http import HttpResponse
 
     from .models import Wifi, WifiDevice
-    from .forms import WifiForm
+    from .forms import WifiForm, WifiForgetForm
 
     wifi_form = WifiForm(request.POST)
 
@@ -209,7 +209,9 @@ def wifi_scan(request):
     available_wifis = Wifi.objects.filter(available=True)
     for available_wifi in available_wifis:
         print(available_wifi.ssid)
-    html = render_to_string('oikos/wifi-scan.html', {'available_wifis': available_wifis, 'wifi_single': wifi_object, 'wifi_form': wifi_form}, request=request)
+
+    wifi_forget_form = WifiForgetForm(request.POST)
+    html = render_to_string('oikos/wifi-scan.html', {'available_wifis': available_wifis, 'wifi_single': wifi_object, 'wifi_form': wifi_form, 'wifi_forget_form': wifi_forget_form}, request=request)
     return HttpResponse(html)
 
 def wifi_connect(request):
