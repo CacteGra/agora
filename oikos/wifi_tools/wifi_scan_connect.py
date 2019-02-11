@@ -75,6 +75,8 @@ def delete_wifi(wifi_device):
         pass
 
     print('nice shoe')
+    Popen(['sudo', 'wpa_cli', '-i', wifi_device, 'reconfigure'], stdout=PIPE, stderr=PIPE)
+    Popen(['sudo', 'killall', 'wpa_supplicant'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'stop', 'wpa_supplicant.service'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'disable', 'wpa_supplicant'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'daemon-reload'], stdout=PIPE, stderr=PIPE)
