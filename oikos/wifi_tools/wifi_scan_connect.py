@@ -23,7 +23,7 @@ def connect(wifi_mac_address,interface_name):
     with open(getcwd() + '/oikos/wifi_tools/wpa_supplicant_default_start.conf', 'r') as f:
             default_wpa = f.read()
     if to_connect.encryption_type:
-        wpa_supplicant_default, errors = check_output(['sudo', 'wpa_passphrase', '"{}"'.format(to_connect.ssid), '"{}"'.format(to_connect.password)]).decode('utf-8')
+        wpa_supplicant_default = check_output(['sudo', 'wpa_passphrase', '"{}"'.format(to_connect.ssid), '"{}"'.format(to_connect.password)]).decode('utf-8')
     else:
         with open(getcwd() + '/oikos/wifi_tools/wpa_supplicant_default.conf', 'r') as f:
             wpa_supplicant_default = f.read()
