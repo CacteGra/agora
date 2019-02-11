@@ -250,6 +250,8 @@ def wifi_connect(request):
 def wifi_forget(request):
     from subprocess import Popen, PIPE
 
+    from django.http import HttpResponseRedirect
+
     from .models import Wifi
 
     from .forms import WifiForgetForm
