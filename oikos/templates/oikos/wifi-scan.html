@@ -7,13 +7,6 @@
 {% endif %}
 
 {% for available_wifi in available_wifis %}
-{% if available_wifi.known %}
-<div class="alert alert-secondary hidden_password" id="{{ available_wifi.id }}" style="display: none;">                <form method="POST" action="{% url 'wifi_forget' %}" class="post-form">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-warning" id="{{ available_wifi.mac_address }}">Forget</button>
-  </form>
-</div>
-{% endif %}
 <form role="form" method="POST" action="{% url 'wifi_connect'  %}" class="post-form">
   {% csrf_token %}
   {% if available_wifi.connected %}
@@ -70,4 +63,10 @@
     <button type="button" class="btn btn-danger wifi-cancel" id="{{ available_wifi.id }}">Cancel</button>
   </div>
 </form>
+{% if available_wifi.known %}
+<form method="POST" action="{% url 'wifi_forget' %}" class="post-form">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-warning" id="{{ available_wifi.mac_address }}">Forget</button>
+</form>
+{% endif %}
 {% endfor %}
