@@ -140,10 +140,11 @@
             <button type="cancel" class="btn btn-danger wifi_manual_cancel" id="{{ wifi_form.ssid.name }}">Cancel</button>
           </form>
           {% if available_wifi.known %}
-          <form method="POST" action="{% url 'wifi_forget' %}" class="post-form">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-warning" id="{{ available_wifi.mac_address }}">Forget</button>
-          </form>
+          <div class="alert alert-secondary hidden_password" id="{{ available_wifi.id }}" style="display: none;">                <form method="POST" action="{% url 'wifi_forget' %}" class="post-form">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-warning" id="{{ available_wifi.mac_address }}">Forget</button>
+            </form>
+          </div>
           {% endif %}
         </div>
         <div class="all_wifi">
@@ -211,10 +212,11 @@
             </div>
           </form>
           {% if available_wifi.known %}
-          <form method="POST" action="{% url 'wifi_forget' %}" class="post-form">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-warning" id="{{ available_wifi.mac_address }}">Forget</button>
-          </form>
+          <div class="alert alert-secondary hidden_password" id="{{ available_wifi.id }}" style="display: none;">                <form method="POST" action="{% url 'wifi_forget' %}" class="post-form">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-warning" id="{{ available_wifi.mac_address }}">Forget</button>
+            </form>
+          </div>
           {% endif %}
           {% endfor %}
           {% endif %}
