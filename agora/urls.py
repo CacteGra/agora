@@ -27,10 +27,10 @@ urlpatterns = [
     url(r'^wifi_turn/(?P<wifi_device_id>\d+)/$', oikos_views.wifi_turn, name='wifi_turn'),
     url(r'^wifi_scan/$', oikos_views.wifi_scan, name='wifi_scan'),
     url(r'^wifi_connect/$', oikos_views.wifi_connect, name='wifi_connect'),
+    url(r'^wifi_forget/$', oikos_views.wifi_connect, name='wifi_forget'),
     url(r'^hotspot_turn/(?P<wifi_device_id>\d+)/$', oikos_views.hotspot_turn, name='hotspot_turn'),
     url(r'^hotspot_submit/$', oikos_views.hotspot_submit, name='hotspot_submit'),
     url(r'^bluetooth_turn/(?P<bluetooth_device_id>\d+)/$', oikos_views.bluetooth_turn, name='bluetooth_turn'),
     url(r'^bluetooth_scan/$', oikos_views.bluetooth_scan, name='bluetooth_scan'),
     url(r'^bluetooth_pair/$', oikos_views.bluetooth_pair, name='bluetooth_pair'),
 ]
-
