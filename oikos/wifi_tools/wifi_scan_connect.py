@@ -42,8 +42,6 @@ def connect(wifi_mac_address,interface_name):
     Popen(['sudo', 'ifconfig', interface_name, 'up'], stdout=PIPE, stderr=PIPE)
     connection_status, errors = Popen(['sudo', 'wpa_cli', '-i', interface_name, 'reconfigure'], stdout=PIPE, stderr=PIPE).communicate()
     print(connection_status)
-    wifi_device = WifiDevice.objects.get(name=interface_name)
-    Wifi.objects.filter(wifi_device=wifi_device).update(connected=False)
     to_connect = Wifi.objects.get(mac_address=wifi_mac_address)
     to_connect.connected = True
     to_connect.available = True

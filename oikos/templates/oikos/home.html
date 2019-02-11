@@ -140,7 +140,8 @@
             <button type="cancel" class="btn btn-danger wifi_manual_cancel" id="{{ wifi_form.ssid.name }}">Cancel</button>
             {% if available_wifi.known %}
             <form method="POST" action="{% url 'wifi_forget' %}" class="post-form">
-              <button type="submit" class="btn btn-warning" id="{{ wifi_form.ssid.name }}">Cancel</button>
+              {% csrf_token %}
+              <button type="submit" class="btn btn-warning" id="{{ available_wifi.mac_address }}">Forget</button>
             </form>
             {% endif %}
           </form>
@@ -209,7 +210,8 @@
               <button type="button" class="btn btn-danger wifi-cancel" id="{{ available_wifi.id }}">Cancel</button>
               {% if available_wifi.known %}
               <form method="POST" action="{% url 'wifi_forget' %}" class="post-form">
-                <button type="submit" class="btn btn-warning" id="{{ wifi_form.ssid.name }}">Cancel</button>
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning" id="{{ available_wifi.mac_address }}">Forget</button>
               </form>
               {% endif %}
             </div>
