@@ -177,7 +177,7 @@ def wifi_turn(request, wifi_device_id):
                 sub_proc = check_output(['sudo', 'ifconfig', wifi_device.name, 'down']).decode('utf-8')
                 add_hotspot.delete_hotspot(wifi_device.id)
                 Hotspot.objects.filter(wifi_device__name=wifi_device.name).update(active=False)
-                sub_proc = Popen(['sudo', 'ifconfig', wifi_device.name, 'up'], stdout=PIPE, stderr=PIPE)
+                Popen(['sudo', 'ifconfig', wifi_device.name, 'up'], stdout=PIPE, stderr=PIPE)
                 ifconfig = check_output(['ifconfig']).decode('utf-8')
                 while wifi_device.name not in ifconfig:
                     sleep(0.10)
@@ -256,12 +256,12 @@ def wifi_forget(request):
         if wifi_forget_form.is_valid():
             wifi_forget_form_wait = wifi_forget_form.get(Wifi.objects.filter(mac_address=wifi_forget_form.mac_address)).update(known=False,Connected=False,Password=None)
             wifi_scan_connect.delete_wifi(wifi_device.name)
-            sub_proc = Popen(['sudo', 'ifconfig', wifi_device, 'up'], stdout=PIPE, stderr=PIPE)
+            Popen(['sudo', 'ifconfig', wifi_device, 'up'], stdout=PIPE, stderr=PIPE)
 
     return HttpResponseRedirect('/')
 
 def bluetooth_turn(request, bluetooth_device_id):
-    from subprocess import Popen, PIPE
+    from subprocess import check_output
 
     from .bluetooth_tools import bluetooth_scan
 
@@ -274,7 +274,7 @@ def bluetooth_turn(request, bluetooth_device_id):
     print('got 404')
     print(bluetooth)
     if request.method == 'POST':
-        is_active = Popen(['sudo', 'systemctl', 'is-active', 'bluetooth'], stdout=PIPE, stderr=PIPE)
+        is_active = check_output(['sudo', 'systemctl', 'is-active', 'bluetooth'])
         if is_active.replace('\n', '') == 'active':
             print('turning off')
             bluetooth_scan.turn_off(bluetooth_device_id)

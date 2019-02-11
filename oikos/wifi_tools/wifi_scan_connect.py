@@ -23,7 +23,7 @@ def connect(wifi_mac_address,interface_name):
     with open(getcwd() + '/oikos/wifi_tools/wpa_supplicant_default_start.conf', 'r') as f:
             default_wpa = f.read()
     if to_connect.encryption_type:
-        wpa_supplicant_default, errors = Popen(['sudo', 'wpa_passphrase', '"{}"'.format(to_connect.ssid), '"{}"'.format(to_connect.password)], stdout=PIPE, stderr=PIPE)
+        Popen(['sudo', 'wpa_passphrase', '"{}"'.format(to_connect.ssid), '"{}"'.format(to_connect.password)], stdout=PIPE, stderr=PIPE)
     else:
         with open(getcwd() + '/oikos/wifi_tools/wpa_supplicant_default.conf', 'r') as f:
             wpa_supplicant_default = f.read()
@@ -40,7 +40,7 @@ def connect(wifi_mac_address,interface_name):
     Popen(['sudo', 'systemctl', 'restart', 'networking'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', '/etc/init.d/networking', 'restart'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'ifconfig', interface_name, 'up'], stdout=PIPE, stderr=PIPE)
-    connection_status, errors = Popen(['sudo', 'wpa_cli', '-i', interface_name, 'reconfigure'], stdout=PIPE, stderr=PIPE)
+    connection_status, errors = Popen(['sudo', 'wpa_cli', '-i', interface_name, 'reconfigure'], stdout=PIPE, stderr=PIPE).communicate()
     print(connection_status)
     wifi_device = WifiDevice.objects.get(name=interface_name)
     Wifi.objects.filter(wifi_device=wifi_device).update(connected=False)
@@ -87,8 +87,8 @@ def delete_wifi(wifi_device):
     dhcpcd_journal = check_output(['sudo', 'journalctl', '-u', 'dhcpcd', '-b']).decode('utf-8')
     dhcpcd_count = dhcpcd_journal.count('wlan0: waiting for carrier')
     print('nice shoe1')
-    sub_proc = Popen(['sudo', 'systemctl', 'restart', 'dhcpcd'], stdout=PIPE, stderr=PIPE)
-    sub_proc = Popen(['sudo', 'systemctl', 'restart', 'networking'], stdout=PIPE, stderr=PIPE)
+    Popen(['sudo', 'systemctl', 'restart', 'dhcpcd'], stdout=PIPE, stderr=PIPE)
+    Popen(['sudo', 'systemctl', 'restart', 'networking'], stdout=PIPE, stderr=PIPE)
     print('nice shoe1.5')
     dhcpcd_journal = check_output(['sudo', 'journalctl', '-u', 'dhcpcd', '-b']).decode('utf-8')
     print('nice shoe1.6')
@@ -105,7 +105,7 @@ def delete_wifi(wifi_device):
             dhcpcd_restart_count = dhcpcd_journal.count('wlan0: waiting for carrier')
     print(dhcpcd_restart_count)
     print('nice shoe3')
-    sub_proc = Popen(['sudo', 'ifconfig', wifi_device, 'down'], stdout=PIPE, stderr=PIPE)
+    Popen(['sudo', 'ifconfig', wifi_device, 'down'], stdout=PIPE, stderr=PIPE)
     ifconfig = check_output(['ifconfig']).decode('utf-8')
     print(ifconfig)
     print('noel')
