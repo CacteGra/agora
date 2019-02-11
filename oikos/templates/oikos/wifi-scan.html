@@ -66,6 +66,7 @@
 {% if available_wifi.known %}
 <div class="alert alert-secondary hidden_password" id="{{ available_wifi.id }}" style="display: none;">                <form method="POST" action="{% url 'wifi_forget' %}" class="post-form">
     {% csrf_token %}
+    <input name="{{ wifi_forget_form.mac_address.name }}" id="{{ wifi_forget_form.mac_address.id_for_label }}" value="{{ available_wifi.mac_address }}" maxlength="280" type="hidden">
     <button type="submit" class="btn btn-warning" id="{{ available_wifi.mac_address }}">Forget</button>
   </form>
 </div>

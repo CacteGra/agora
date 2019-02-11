@@ -254,9 +254,10 @@ def wifi_forget(request):
 
     from .forms import WifiForgetForm
 
+    wifi_forget_form = WifiForgetForm(request.POST)
     if request.method == 'POST':
         if wifi_forget_form.is_valid():
-            wifi_forget_form_wait = wifi_forget_form.get(Wifi.objects.filter(mac_address=wifi_forget_form.mac_address)).update(known=False,Connected=False,Password=None)
+             = wifi_forget_form.get(Wifi.objects.filter(mac_address=wifi_forget_form.mac_address)).update(known=False,Connected=False,Password=None)
             wifi_scan_connect.delete_wifi(wifi_device.name)
             Popen(['sudo', 'ifconfig', wifi_device, 'up'], stdout=PIPE, stderr=PIPE)
 
