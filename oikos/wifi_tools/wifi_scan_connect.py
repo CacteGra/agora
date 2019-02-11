@@ -44,10 +44,6 @@ def connect(wifi_mac_address,interface_name):
     print(connection_status)
     wifi_device = WifiDevice.objects.get(name=interface_name)
     Wifi.objects.filter(wifi_device=wifi_device).update(connected=False)
-    ifconfig = check_output(['ifconfig', interface_name]).decode('utf-8')
-    while "inet " not in ifconfig:
-        sleep(1)
-        ifconfig = check_output(['ifconfig', interface_name]).decode('utf-8')
     to_connect = Wifi.objects.get(mac_address=wifi_mac_address)
     to_connect.connected = True
     to_connect.available = True
