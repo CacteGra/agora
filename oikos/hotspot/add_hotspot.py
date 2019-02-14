@@ -1,4 +1,4 @@
-from requests import get
+from os import getcwd
 from subprocess import Popen, PIPE, check_output
 
 from oikos.models import WifiDevice, Hotspot
