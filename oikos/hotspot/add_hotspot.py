@@ -60,8 +60,8 @@ def delete_hotspot(id):
                 print(line)
                 f.write(line)
     new_conf = getcwd() + '/oikos/hotspot/dhcpcd.conf'
-    default_conf = '/etc/dhcpcd.conf'
-    Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE)
+    with open('/etc/dhcpcd.conf', 'w') as default_conf:
+        default_conf.write(new_conf)
     Popen(['sudo', 'systemctl', 'daemon-reload'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'restart dhcpcd'], stdout=PIPE, stderr=PIPE)
 
@@ -135,8 +135,8 @@ def main(id, change):
         with open('/etc/default/hostapd', 'w') as default_conf:
             default_conf.write(hostapd)
         new_conf = getcwd() + '/oikos/hotspot/hostapd.conf'
-        default_conf = '/etc/default/hostapd'
-        Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE)
+        with open('/etc/default/hostapd', 'w') as default_conf:
+            default_conf.write(new_conf)
         Popen(['sudo', 'ifconfig', wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
         with open('/etc/dhcpcd.conf', 'r') as f:
             dhcpcd = f.readlines()
