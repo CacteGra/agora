@@ -34,8 +34,6 @@ def delete_hotspot(id):
         dhcpcd = f.readlines()
     Popen(['sudo', 'ifconfig', the_hotspot.wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
     print('brought wlan0 down')
-    with open(getcwd() + '/oikos/hotspot/dhcpcd.conf', 'r') as f:
-        conf = f.read()
     with open(getcwd() + '/oikos/hotspot/dhcpcd.conf', 'w') as f:
         wifi_list = []
         for line in dhcpcd:
@@ -61,7 +59,8 @@ def delete_hotspot(id):
             else:
                 print(line)
                 f.write(line)
-    new_conf = getcwd() + '/oikos/hotspot/dhcpcd.conf'
+    with open(getcwd() + '/oikos/hotspot/dhcpcd.conf', 'r') as f:
+        new_conf = f.read()
     with open('/etc/dhcpcd.conf', 'w') as default_conf:
         default_conf.write(new_conf)
     Popen(['sudo', 'systemctl', 'daemon-reload'], stdout=PIPE, stderr=PIPE)
@@ -144,7 +143,7 @@ def main(id, change):
     with open('/etc/dhcpcd.conf', 'r') as f:
         dhcpcd = f.readlines()
     print(dhcpcd)
-    if not wifi_device.name in dhcpcd:
+    if not any(wifi_device.name in line for line in dhcpcd):
         if 'denyinterfaces' in dhcpcd:
             with open(getcwd() + '/oikos/hotspot/dhcpcd.conf', 'w') as f:
                 for line in dhcpcd:
