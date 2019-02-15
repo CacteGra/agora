@@ -100,11 +100,6 @@ def delete_wifi(wifi_device):
     ifconfig = check_output(['ifconfig']).decode('utf-8')
     print(ifconfig)
     print('noel')
-    while wifi_device in ifconfig:
-        print('while')
-        print(wifi_device)
-        sleep(0.10)
-        ifconfig = check_output(['ifconfig']).decode('utf-8')
     return True
 
 def main(wifi_device):
