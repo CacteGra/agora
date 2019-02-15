@@ -94,11 +94,6 @@ def delete_wifi(wifi_device):
     print(dhcpcd_restart_count)
     print(dhcpcd_count)
     ifconfig = check_output(['ifconfig']).decode('utf-8')
-    if wifi_device in ifconfig:
-        while dhcpcd_restart_count == dhcpcd_count:
-            sleep(1)
-            dhcpcd_journal = check_output(['sudo', 'journalctl', '-u', 'dhcpcd', '-b']).decode('utf-8')
-            dhcpcd_restart_count = dhcpcd_journal.count('wlan0: waiting for carrier')
     print(dhcpcd_restart_count)
     print('nice shoe3')
     Popen(['sudo', 'ifconfig', wifi_device, 'down'], stdout=PIPE, stderr=PIPE)
