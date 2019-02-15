@@ -92,7 +92,7 @@ def main(id, change):
         print('in the try')
         the_hotspot = Hotspot.objects.get(wifi_device=wifi_device)
         with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
-            hostapd = f.read()
+            hostapd = f.readlines()
         if wifi_device.name in hostapd and the_hotspot.active and wifi_device.name in check_output(['sudo', 'ifconfig', '-a']).decode('utf-8'):
             right_lines = False
             with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
@@ -134,7 +134,8 @@ def main(id, change):
         hostapd = f.read()
     with open('/etc/default/hostapd', 'w') as default_conf:
         default_conf.write(hostapd)
-    new_conf = getcwd() + '/oikos/hotspot/hostapd.conf'
+    with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
+        new_conf = f.read()
     with open('/etc/default/hostapd', 'w') as default_conf:
         default_conf.write(new_conf)
     Popen(['sudo', 'ifconfig', wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
@@ -151,7 +152,7 @@ def main(id, change):
                     else:
                         f.write(line)
             with open(getcwd() + '/oikos/hotspot/dhcpcd.conf', 'r') as f:
-                dhcpcd = f.read()
+                dhcpcd = f.readlines()
             with open('/etc/dhcpcd.conf', 'w') as default_dhcpcd:
                 default_dhcpcd.write(new_conf)
         else:

@@ -283,7 +283,7 @@ def bluetooth_turn(request, bluetooth_device_id):
     print('got 404')
     print(bluetooth)
     if request.method == 'POST':
-        is_active = check_output(['sudo', 'systemctl', 'is-active', 'bluetooth'])
+        is_active = check_output(['sudo', 'systemctl', 'is-active', 'bluetooth']).decode('utf-8')
         if is_active.replace('\n', '') == 'active':
             print('turning off')
             bluetooth_scan.turn_off(bluetooth_device_id)
@@ -339,7 +339,6 @@ def bluetooth_pair(request):
 
 def hotspot_turn(request, wifi_device_id):
     from os import getcwd
-    from subprocess import Popen, PIPE, check_output
 
     from django.http import HttpResponseRedirect
 
@@ -356,7 +355,6 @@ def hotspot_turn(request, wifi_device_id):
             return HttpResponseRedirect('/')
         if Hotspot.objects.filter(active=True,wifi_device=wifi_device).count() > 0:
             print('deleting')
-            Popen(['sudo', 'ifconfig', wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
             add_hotspot.delete_hotspot(wifi_device.id)
         else:
             with open(getcwd() + "/oikos/hotspot/{}_hostapd.conf".format(wifi_device.name), "w"):
