@@ -34,6 +34,8 @@ def delete_hotspot(id):
         dhcpcd = f.readlines()
     Popen(['sudo', 'ifconfig', the_hotspot.wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
     print('brought wlan0 down')
+    with open(getcwd() + '/oikos/hotspot/dhcpcd.conf', 'r') as f:
+        conf = f.read()
     with open(getcwd() + '/oikos/hotspot/dhcpcd.conf', 'w') as f:
         wifi_list = []
         for line in dhcpcd:
