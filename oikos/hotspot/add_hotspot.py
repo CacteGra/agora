@@ -84,7 +84,7 @@ def main(id, change):
         if the_hotspot.on_boot:
             Popen(['sudo', 'systemctl', 'restart', 'hostapd'], stdout=PIPE, stderr=PIPE)
         else:
-            Popen(['hostapd', '-B', getcwd() + '/oikos/hotspot/hostapd.conf'], stdout=PIPE, stderr=PIPE)
+            Popen(['sudo', 'hostapd', '-B', getcwd() + '/oikos/hotspot/hostapd.conf'], stdout=PIPE, stderr=PIPE)
         Popen(['sudo', 'ifconfig', the_hotspot.wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
         Popen(['sudo', 'ifconfig', the_hotspot.wifi_device.name, 'up'], stdout=PIPE, stderr=PIPE)
         return True
