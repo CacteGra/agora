@@ -152,7 +152,7 @@ def main(id, change):
                     else:
                         f.write(line)
             with open(getcwd() + '/oikos/hotspot/dhcpcd.conf', 'r') as f:
-                dhcpcd = f.readlines()
+                new_conf = f.readlines()
             with open('/etc/dhcpcd.conf', 'w') as default_dhcpcd:
                 default_dhcpcd.write(new_conf)
         else:
@@ -164,7 +164,7 @@ def main(id, change):
                 for line in dhcpcd:
                     f.write(line)
             with open(getcwd() + '/oikos/hotspot/dhcpcd.conf', 'r') as f:
-                dhcpcd = f.read()
+                new_conf = f.read()
             with open('/etc/dhcpcd.conf', 'w') as default_dhcpcd:
                 default_dhcpcd.write(new_conf)
     Popen(['sudo', 'systemctl', 'daemon-reload'], stdout=PIPE, stderr=PIPE)
