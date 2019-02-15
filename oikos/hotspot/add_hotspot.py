@@ -90,7 +90,7 @@ def main(id, change):
         return True
     try:
         print('in the try')
-        the_hotspot = Hotspot.objects.get(wifi_device=wifi_device,active=True)
+        the_hotspot = Hotspot.objects.get(wifi_device=wifi_device)
         with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
             hostapd = f.read()
         if wifi_device.name in hostapd and the_hotspot.active and wifi_device.name in check_output(['sudo', 'ifconfig', '-a']).decode('utf-8'):
@@ -99,7 +99,7 @@ def main(id, change):
                 hostapd = f.readlines()
             with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'w') as f:
                 for line in hostapd:
-                    if '**{}**'.format(wifi_device.name) in line:
+                    if 'inteface={}'.format(wifi_device.name) in line:
                         if right_lines:
                             right_lines = False
                         else:
@@ -130,13 +130,10 @@ def main(id, change):
                         f.write('DAEMON_CONF="{}/oikos/hotspot/hostapd.conf"'.format(getcwd()) + "\n")
                     else:
                         f.write(line)
-            new_conf = getcwd() + '/oikos/hotspot/hostapd.conf'
-            default_conf = '/etc/default/hostapd'
-            Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE)
-        with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'w') as hostapd_conf:
-            print('writing')
-            print(hostapd_sample)
-            hostapd_conf.write(hostapd_sample)
+        with open(getcwd() + '/oikos/hotspot/hostapd', 'r') as f:
+            hostapd = f.read()
+        with open('/etc/default/hostapd', 'w') as default_conf:
+            default_conf.write(hostapd)
         new_conf = getcwd() + '/oikos/hotspot/hostapd.conf'
         default_conf = '/etc/default/hostapd'
         Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE)
@@ -153,9 +150,10 @@ def main(id, change):
                             print('writing deny line')
                         else:
                             f.write(line)
-                new_conf = getcwd() + '/oikos/hotspot/dhcpcd.conf'
-                default_conf = '/etc/dhcpcd.conf'
-                Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE)
+                with open(getcwd() + '/oikos/hotspot/dhcpcd.conf', 'r') as f:
+                    dhcpcd = f.read()
+                with open('/etc/dhcpcd.conf', 'w') as default_dhcpcd:
+                    default_dhcpcd.write(new_conf)
             else:
                 if '\n' in dhcpcd[-1]:
                     dhcpcd.append('denyinterfaces ' + wifi_device.name)
@@ -164,9 +162,10 @@ def main(id, change):
                 with open(getcwd() + '/oikos/hotspot/dhcpcd.conf', 'w') as f:
                     for line in dhcpcd:
                         f.write(line)
-                new_conf = getcwd() + '/oikos/hotspot/dhcpcd.conf'
-                default_conf = '/etc/dhcpcd.conf'
-                Popen(['sudo', 'cp', '-f', new_conf, default_conf], stdout=PIPE, stderr=PIPE)
+                with open(getcwd() + '/oikos/hotspot/dhcpcd.conf', 'r') as f:
+                    dhcpcd = f.read()
+                with open('/etc/dhcpcd.conf', 'w') as default_dhcpcd:
+                    default_dhcpcd.write(new_conf)
         Popen(['sudo', 'systemctl', 'daemon-reload'], stdout=PIPE, stderr=PIPE)
         Popen(['sudo', 'systemctl', 'restart', 'hostapd'], stdout=PIPE, stderr=PIPE)
         Popen(['sudo', 'systemctl', 'restart', 'dhcpcd'], stdout=PIPE, stderr=PIPE)
