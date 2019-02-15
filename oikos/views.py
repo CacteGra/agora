@@ -354,7 +354,7 @@ def hotspot_turn(request, wifi_device_id):
             wifi_device = WifiDevice.objects.get(id=wifi_device_id)
         except WifiDevice.DoesNotExist:
             return HttpResponseRedirect('/')
-        if ('inet' in check_output(['ifconfig', wifi_device.name]).decode('utf-8')) and ('Master' in check_output(['iwconfig', wifi_device.name]).decode('utf-8')) and Hotspot.objects.filter(active=True).count() > 0:
+        if Hotspot.objects.filter(active=True,wifi_device=wifi_device).count() > 0:
             print('deleting')
             Popen(['sudo', 'ifconfig', wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
             add_hotspot.delete_hotspot(wifi_device.id)
