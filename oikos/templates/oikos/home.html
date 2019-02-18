@@ -107,7 +107,7 @@
               No password
             </div>
             Activate {{ wifi_single.hotspot.name }} on boot?
-            {{ hotspot_form.on_boot }}
+            <input type="checkbox" {% if wifi_single.hotspot.on_boot %} checked {% endif %} name="{{ hotspot_form.on_boot.name }}" id="{{ hotspot_form.on_boot.id_for_label }}">
             <br></br>
             <button type="submit" class="btn btn-primary hotspot_submit" id="{{ wifi_single.mac_address }}">Save hotspot name and password</button>
             <button type="button" class="btn btn-danger hotspot_cancel" id="cancel_modify_hotspot">Cancel</button>
