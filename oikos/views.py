@@ -381,7 +381,7 @@ def hotspot_submit(request):
     if request.method == 'POST':
         if hotspot_form.is_valid():
             hotspot_form_wait = hotspot_form.save(commit=False)
-            the_hotspot = Hotspot.objects.get(hotspot_form_wait.name)
+            the_hotspot = Hotspot.objects.get(name=hotspot_form_wait.name)
             the_hotspot.name = hotspot_form_wait.name
             the_hotspot.password = hotspot_form_wait.password
             the_hotspot.on_boot = hotspot_form_wait.on_boot
