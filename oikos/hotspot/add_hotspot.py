@@ -14,7 +14,7 @@ def delete_hotspot(id):
     the_hotspot.save()
     all_hotspots = Hotspot.objects.filter(active=True)
     if all_hotspots.count() == 0:
-        with open(getcwd() + '/oikos/hostspot/hostapd.conf', 'w'):
+        with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'w'):
             pass
     else:
         with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
@@ -83,7 +83,7 @@ def change(id):
     all_hotspots = Hotspot.objects.filter(active=True)
     all_on_boot_hotspots = Hotspot.objects.filter(on_boot=True)
     if all_hotspots.count() == 0:
-        with open(getcwd() + '/oikos/hostspot/hostapd.conf', 'w'):
+        with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'w'):
             pass
     the_hotspot = Hotspot.objects.get(wifi_device=wifi_device)
     with open('/etc/default/hostapd', 'r') as f:
@@ -126,7 +126,7 @@ def main(id):
     wifi_device = WifiDevice.objects.get(id=id)
     all_hotspot = Hotspot.objects.filter(active=True)
     if all_hotspot.count() == 0:
-        with open(getcwd() + '/oikos/hostspot/hostapd.conf', 'w'):
+        with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'w'):
             pass
     try:
         print('in the try')
