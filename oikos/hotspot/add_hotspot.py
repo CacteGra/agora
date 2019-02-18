@@ -119,7 +119,6 @@ def change(id):
         Popen(['sudo', 'systemctl', 'restart', 'hostapd'], stdout=PIPE, stderr=PIPE)
     else:
         Popen(['sudo', 'hostapd', '-B', getcwd() + '/oikos/hotspot/hostapd.conf'], stdout=PIPE, stderr=PIPE)
-    Popen(['sudo', 'ifconfig', the_hotspot.wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
     return True
 
 def main(id):
