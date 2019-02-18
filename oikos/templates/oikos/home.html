@@ -113,6 +113,7 @@
             <button type="cancel" class="btn btn-danger hotspot_cancel" id="cancel_modify_hotspot">Cancel</button>
           </form>
         </div>
+        <br></br>
         {% endif %}
         <form method="POST" class="post-form">
           {% csrf_token %}
@@ -340,11 +341,11 @@ $(".primal-cancel").click(function () {
   })
 
   $( "#modify_hotspot" ).click(function( event ) {
-    $('.wifi_hotspot_set').show();
+    $('#wifi_hotspot_set').toggle();
   })
 
   $( "#cancel_modify_hotspot" ).click(function( event ) {
-    $('.wifi_hotspot_set').hide();
+    $('#wifi_hotspot_set').hide();
   })
 
   $( ".wifi_manual_submit" ).submit(function( event ) {
