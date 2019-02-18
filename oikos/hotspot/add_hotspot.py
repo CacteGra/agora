@@ -103,8 +103,9 @@ def change(id):
                 else:
                     f.write(line)
     with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
-        hostapd = f.readlines()
-        for line in hostapd:
+        hostapd_conf = f.readlines()
+    with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'w') as f:
+        for line in hostapd_conf:
             if "interface=" in line:
                 f.write("interface={}".format(the_hotspot.wifi_device.name))
             elif "wpa_passphrase=" in line:
