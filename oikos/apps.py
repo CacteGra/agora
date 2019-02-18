@@ -21,7 +21,7 @@ class OikosConfig(AppConfig):
 
             from .models import Wifi
 
-            ifconfig = check_ouput('ifconfig')
+            ifconfig = check_output('ifconfig').decode('utf-8')
             if 'inet' not in ifconfig:
                 wifi.objects.all().update(available=False)
                 wifi_scan_connect.scan_only(powered_wifi.name)
