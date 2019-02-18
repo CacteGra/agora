@@ -185,7 +185,7 @@ def main(id):
         with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
             hostapd_origin = f.read()
     else:
-        hostapd_origin = None
+        hostapd_origin = ''
     with open(getcwd() + '/oikos/hotspot/hostapd_sample.conf', 'r') as f_hotspot:
         hostapd_sample = f_hotspot.read()
     hostapd_sample = hostapd_sample.replace('####', wifi_device.name)
