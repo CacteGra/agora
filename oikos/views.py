@@ -170,7 +170,7 @@ def wifi_turn(request, wifi_device_id):
                 iwconfig = check_output(['iwconfig', wifi_device.name]).decode('utf-8')
                 if 'Master' in iwconfig:
                     add_hotspot.delete_hotspot(wifi_device.id)
-                wifi_scan_connect.delete_wifi(wifi_device.name)
+                wifi_scan_connect.turn_off(wifi_device.name)
                 print(wifi_device.name)
             else:
                 Wifi.objects.filter(wifi_device__name=wifi_device.name).update(available=False,connected=False)
@@ -264,7 +264,7 @@ def wifi_forget(request):
             wifi_forget_form_wait = wifi_forget_form.save(commit=False)
             wifi = Wifi.objects.filter(mac_address=wifi_forget_form_wait.mac_address)
             wifi.update(known=False,connected=False,password=None)
-            wifi_scan_connect.delete_wifi(wifi.wifi_device.name)
+            wifi_scan_connect.turn_off(wifi.wifi_device.name)
             Popen(['sudo', 'ifconfig', wifi_device, 'up'], stdout=PIPE, stderr=PIPE)
 
     return HttpResponseRedirect('/')
@@ -358,11 +358,11 @@ def hotspot_turn(request, wifi_device_id):
             add_hotspot.delete_hotspot(wifi_device.id)
         else:
             if Hotspot.objects.filter(wifi_device=wifi_device,primary=True).count() > 0:
-                wifi_scan_connect.delete_wifi(wifi_device.name)
+                wifi_scan_connect.turn_off(wifi_device.name)
                 add_hotspot.main(wifi_device.id)
             else:
                 Hotspot.objects.filter(wifi_device=wifi_device).update(active=False)
-                wifi_scan_connect.delete_wifi(wifi_device.name)
+                wifi_scan_connect.turn_off(wifi_device.name)
                 add_hotspot.main(wifi_device.id)
 
     return HttpResponseRedirect('/')

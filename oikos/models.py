@@ -23,7 +23,6 @@ class Wifi(models.Model):
     connected = models.BooleanField(default=False)
     strength = models.CharField(max_length=4,null=True)
     known = models.BooleanField(default=False)
-    on_boot = models.BooleanField(default=False)
     device_name = models.CharField(max_length=100,null=True)
     wifi_device = models.ForeignKey(WifiDevice, on_delete=models.CASCADE,null=True)
 

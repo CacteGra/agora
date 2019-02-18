@@ -67,7 +67,7 @@ def scan_only(wifi_device):
         scanned_wifi.available = True
         scanned_wifi.save()
 
-def delete_wifi(wifi_device):
+def turn_off(wifi_device):
     from subprocess import Popen, PIPE, check_output
     from time import sleep
 

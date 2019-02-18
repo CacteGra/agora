@@ -7,10 +7,14 @@ class OikosConfig(AppConfig):
 
         from .models import WifiDevice, BluetoothDevice, Hotspot
 
-        powered_bluetooth = BluetoothDevice.objects.filter(powered=True)
-        powered_wifi = WifiDevice.objects.filter(on_boot=True)
+        all_hotspots = Hotspot.objects.filter(on_boot=True)
+        if all_hotspots.count() == 0:
+            for all_hotspot in all_hotspots:
+                add_hotspot.delete(all_hotspot.wifi_device.name)
 
-        if powered_wifi.count() > 0:
+        powered_wifi = WifiDevice.objects.filter(active=True)
+
+        if powered_wifi.count() > 0 and all_hotspots.count() == 0:
             from subprocess import check_output
 
             from .wifi_tools import wifi_scan_connect
@@ -33,20 +37,15 @@ class OikosConfig(AppConfig):
                         if "inet " in ifconfig:
                             break
                 else:
-                    wifi_scan_connect.delete_wifi(powered_wifi.name)
+                    wifi_scan_connect.turn_off(powered_wifi.name)
                     add_hotspot.main(powered_wifi.id,False)
 
-        powered_wifi = WifiDevice.objects.filter(active=True)
+        powered_bluetooth = BluetoothDevice.objects.filter(powered=True)
 
-        if powered_bluetooth.count() == 0:
+        if powered_bluetooth.count() == 0 and powered_wifi.count() > 0 and all_hotspots.count() > 0:
             from subprocess import Popen, PIPE
             from .bluetooth_tools import bluetooth_scan
             is_active, err = Popen(['sudo', 'systemctl', 'is-active', 'bluetooth'], stdout=PIPE, stderr=PIPE).communicate()
             if is_active.decode('utf-8').replace('\n', '') != 'active':
                 print('turning on')
                 bluetooth_scan.turn_on()
-
-        all_hotspots = Hotspot.objects.filter(on_boot=False)
-        if all_hotspots.count() > 0:
-            for all_hotspot in all_hotspots:
-                add_hotspot.delete(all_hotspot.wifi_device.name)

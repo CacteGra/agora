@@ -10,12 +10,11 @@ class WifiDeviceForm(forms.ModelForm):
 class WifiForm(forms.ModelForm):
     class Meta:
         model = Wifi
-        fields = ['ssid','password','mac_address','device_name','on_boot']
+        fields = ['ssid','password','mac_address','device_name']
         ssid = forms.CharField(label='ssid',required=True)
         password = forms.CharField(widget=forms.PasswordInput)
         mac_address = forms.CharField(label='mac_address',required=True)
         device_name = forms.CharField(label='device_name',required=True)
-        on_boot = forms.BooleanField(label='on_boot',required=True,widget=forms.CheckboxInput())
 
 class WifiForgetForm(forms.ModelForm):
     class Meta:
