@@ -91,7 +91,7 @@
         </div>
         {% if hotspot %}
         <button type="button" class="btn btn-secondary" id="modify_hotspot">Modify hotspot</button>
-        <div class="container" id='wifi_hotspot_set'>
+        <div class="container" id='wifi_hotspot_set' style="display: none;">
           <form method="POST" action="{% url 'hotspot_submit' %}" class="post-form">
             {% csrf_token %}
             {% if wifi_single.hotspot.name %}
