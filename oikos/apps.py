@@ -39,12 +39,12 @@ class OikosConfig(AppConfig):
         powered_wifi = WifiDevice.objects.filter(active=True)
 
         if powered_bluetooth.count() == 0:
-            from subprocess import check_ouput
+            from subprocess import Popen, PIPE
             from .bluetooth_tools import bluetooth_scan
-                is_active = check_output(['sudo', 'systemctl', 'is-active', 'bluetooth']).decode('utf-8')
-                if is_active.replace('\n', '') != 'active':
-                    print('turning on')
-                    bluetooth_scan.turn_on()
+            is_active, err = Popen(['sudo', 'systemctl', 'is-active', 'bluetooth'], stdout=PIPE, stderr=PIPE).communicate()
+            if is_active.decode('utf-8').replace('\n', '') != 'active':
+                print('turning on')
+                bluetooth_scan.turn_on()
 
         all_hotspots = Hotspot.objects.filter(on_boot=False)
         if all_hotspots.count() > 0:
