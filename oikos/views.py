@@ -23,8 +23,8 @@ def home(request):
     first_now = datetime.now()
     if BluetoothDevice.objects.filter(powered=True).count() > 0:
         print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
-        bluetooth_active = check_output(['systemctl', 'is-active', 'bluetooth']).decode('utf-8')
-        if bluetooth_active.replace('\n', '') == 'active':
+        bluetooth_active, err = Popen(['systemctl', 'is-active', 'bluetooth'],stdout=PIPE, stderr=PIPE).communicate()
+        if bluetooth_active.decode('utf-8').replace('\n', '') == 'active':
             if Bluetooth.objects.filter(primal=True).count() == 0:
                 controller = bluetooth_scan.controller_show()
                 bluetooth_device = BluetoothDevice.objects.get(id=controller)
@@ -270,7 +270,7 @@ def wifi_forget(request):
     return HttpResponseRedirect('/')
 
 def bluetooth_turn(request, bluetooth_device_id):
-    from subprocess import check_output
+    from subprocess import Popen, PIPE
 
     from .bluetooth_tools import bluetooth_scan
 
@@ -283,8 +283,8 @@ def bluetooth_turn(request, bluetooth_device_id):
     print('got 404')
     print(bluetooth)
     if request.method == 'POST':
-        is_active = check_output(['sudo', 'systemctl', 'is-active', 'bluetooth']).decode('utf-8')
-        if is_active.replace('\n', '') == 'active':
+        is_active, err = Popen(['systemctl', 'is-active', 'bluetooth'],stdout=PIPE, stderr=PIPE).communicate()
+        if is_active.decode('utf-8').replace('\n', '') == 'active':
             print('turning off')
             bluetooth_scan.turn_off(bluetooth_device_id)
         else:
@@ -357,15 +357,13 @@ def hotspot_turn(request, wifi_device_id):
             print('deleting')
             add_hotspot.delete_hotspot(wifi_device.id)
         else:
-            with open(getcwd() + "/oikos/hotspot/{}_hostapd.conf".format(wifi_device.name), "w"):
-                pass
             if Hotspot.objects.filter(wifi_device=wifi_device,primary=True).count() > 0:
                 wifi_scan_connect.delete_wifi(wifi_device.name)
-                add_hotspot.main(wifi_device.id,False)
+                add_hotspot.main(wifi_device.id)
             else:
                 Hotspot.objects.filter(wifi_device=wifi_device).update(active=False)
                 wifi_scan_connect.delete_wifi(wifi_device.name)
-                add_hotspot.main(wifi_device.id,False)
+                add_hotspot.main(wifi_device.id)
 
     return HttpResponseRedirect('/')
 
@@ -385,7 +383,7 @@ def hotspot_submit(request):
             the_hotspot.name = hotspot_form.name
             the_hotspot.password = hotspot_form.password
             the_hotspot.save()
-            add_hotspot.main(the_hotspot.wifi_device.id, change=True)
+            add_hotspot.change(the_hotspot.wifi_device.id)
 
     return HttpResponseRedirect('/')
 

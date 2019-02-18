@@ -76,15 +76,15 @@ def turn_off(bluetooth_device_id):
     Bluetooth.objects.filter(paired=False).delete()
     Bluetooth.objects.all().update(paired=False)
     print('following suit')
-    bluetooth_status = check_output(['sudo', 'systemctl', 'status', 'bluetooth']).decode('utf-8')
-    print(bluetooth_status)
+    bluetooth_status, err = check_output(['sudo', 'systemctl', 'status', 'bluetooth'], stdout=PIPE, stderr=PIPE).communicate()
+    print(bluetooth_status.decode('utf-8'))
 
 def turn_on():
     Popen(['sudo', 'systemctl', 'enable', 'bluetooth'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'start', 'bluetooth'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'start', 'panr'], stdout=PIPE, stderr=PIPE)
-    bluetooth_status = check_output(['sudo', 'systemctl', 'status', 'bluetooth']).decode('utf-8')
-    print(bluetooth_status)
+    bluetooth_status, err = Popen(['sudo', 'systemctl', 'status', 'bluetooth'], stdout=PIPE, stderr=PIPE).communicate()
+    print(bluetooth_status.decode('utf-8'))
 
 def main(bluetooth_device_id=None):
 

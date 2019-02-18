@@ -31,7 +31,6 @@ class HotspotForm(forms.ModelForm):
         password = forms.CharField(widget=forms.PasswordInput)
         on_boot = forms.BooleanField(label='on_boot',required=True,widget=forms.CheckboxInput())
 
-
 class PowerOffForm(forms.ModelForm):
     class Meta:
         model = PowerOff

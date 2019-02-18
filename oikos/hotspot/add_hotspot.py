@@ -1,4 +1,4 @@
-from os import getcwd
+from os import getcwd, stat
 from subprocess import Popen, PIPE, check_output
 
 from oikos.models import WifiDevice, Hotspot
@@ -9,27 +9,39 @@ def file_ending(path):
 
 def delete_hotspot(id):
     wifi_device = WifiDevice.objects.get(id=id)
-    try:
-        the_hotspot = Hotspot.objects.get(wifi_device=wifi_device)
-    except Hotspot.DoesNotExist:
-        print('returning true')
-        return True
-    with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
-        hostapd = f.readlines()
-    delete = False
-    with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'w') as f:
-        for line in hostapd:
-            if wifi_device.name in line:
-                delete = True
-                pass
-            elif "rsn_pairwise=CCMP" in line:
-                delete = False
-            elif delete == True:
-                pass
-            else:
-                f.write(line)
+    the_hotspot = Hotspot.objects.get(wifi_device=wifi_device)
     the_hotspot.active = False
     the_hotspot.save()
+    all_hotspots = Hotspot.objects.filter(active=True)
+    if all_hotspots.count() == 0:
+        with open(getcwd () + '/oikos/hostspot/hostapd.conf', 'w'):
+            pass
+    else:
+        with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
+            hostapd = f.readlines()
+        delete = False
+        with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'w') as f:
+            for line in hostapd:
+                if wifi_device.name in line:
+                    delete = True
+                    pass
+                elif "rsn_pairwise=CCMP" in line:
+                    delete = False
+                elif delete == True:
+                    pass
+                else:
+                    f.write(line)
+    all_on_boot_hotspots = Hotspot.objects.filter(on_boot=True)
+    if all_on_boot_hotspots.count() == 0:
+        with open('/etc/default/hostapd', 'r') as f:
+            hostapd = f.readlines()
+        with open(getcwd() + '/oikos/hotspot/hostapd', 'w') as f:
+            for line in hostapd:
+                if 'DAEMON_CONF=' in line:
+                    f.write('DAEMON_CONF=""')
+                else:
+                    f.write(line)
+
     with open('/etc/dhcpcd.conf', 'r') as f:
         dhcpcd = f.readlines()
     Popen(['sudo', 'ifconfig', the_hotspot.wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
@@ -66,29 +78,56 @@ def delete_hotspot(id):
     Popen(['sudo', 'systemctl', 'daemon-reload'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'restart dhcpcd'], stdout=PIPE, stderr=PIPE)
 
-def main(id, change):
-
+def change(id):
     wifi_device = WifiDevice.objects.get(id=id)
-    if change:
-        the_hotspot = Hotspot.objects.get(wifi_device=wifi_device)
-        with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
-            hostapd = f.readlines()
+    all_hotspots = Hotspot.objects.filter(active=True)
+    all_on_boot_hotspots = Hotspot.objects.filter(on_boot=True)
+    if all_hotspots.count() == 0:
+        with open(getcwd () + '/oikos/hostspot/hostapd.conf', 'w'):
+            pass
+    the_hotspot = Hotspot.objects.get(wifi_device=wifi_device)
+    with open('/etc/default/hostapd', 'r') as f:
+        hostapd = f.readlines()
+    if the_hotspot.on_boot == True:
+        with open(getcwd() + '/oikos/hotspot/hostapd', 'w') as f:
             for line in hostapd:
-                if "interface=" in line:
-                    f.write("interface={}".format(the_hotspot.wifi_device.name))
-                elif "wpa_passphrase=" in line:
-                    f.write("wpa_passphrase={}".format(the_hotspot.password))
-                elif "ssid=" in line:
-                    f.write("ssid={}".format(the_hotspot.name))
+                if 'DAEMON_CONF=' in line:
+                    f.write('DAEMON_CONF="{}/oikos/hotspot/hostapd.conf"'.format(getcwd()))
                 else:
                     f.write(line)
-        if the_hotspot.on_boot:
-            Popen(['sudo', 'systemctl', 'restart', 'hostapd'], stdout=PIPE, stderr=PIPE)
-        else:
-            Popen(['sudo', 'hostapd', '-B', getcwd() + '/oikos/hotspot/hostapd.conf'], stdout=PIPE, stderr=PIPE)
-        Popen(['sudo', 'ifconfig', the_hotspot.wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
-        Popen(['sudo', 'ifconfig', the_hotspot.wifi_device.name, 'up'], stdout=PIPE, stderr=PIPE)
-        return True
+    elif all_on_boot_hotspots.count() == 0:
+        with open(getcwd() + '/oikos/hotspot/hostapd', 'w') as f:
+            for line in hostapd:
+                if 'DAEMON_CONF=' in line:
+                    f.write('DAEMON_CONF=""')
+                else:
+                    f.write(line)
+    with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
+        hostapd = f.readlines()
+        for line in hostapd:
+            if "interface=" in line:
+                f.write("interface={}".format(the_hotspot.wifi_device.name))
+            elif "wpa_passphrase=" in line:
+                f.write("wpa_passphrase={}".format(the_hotspot.password))
+            elif "ssid=" in line:
+                f.write("ssid={}".format(the_hotspot.name))
+            else:
+                f.write(line)
+    Popen(['sudo', 'ifconfig', the_hotspot.wifi_device.name, 'up'], stdout=PIPE, stderr=PIPE)
+    if the_hotspot.on_boot:
+        Popen(['sudo', 'systemctl', 'restart', 'hostapd'], stdout=PIPE, stderr=PIPE)
+    else:
+        Popen(['sudo', 'hostapd', '-B', getcwd() + '/oikos/hotspot/hostapd.conf'], stdout=PIPE, stderr=PIPE)
+    Popen(['sudo', 'ifconfig', the_hotspot.wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
+    return True
+
+def main(id):
+
+    wifi_device = WifiDevice.objects.get(id=id)
+    all_hotspot = Hotspot.objects.filter(active=True)
+    if all_hotspot.count() == 0:
+        with open(getcwd () + '/oikos/hostspot/hostapd.conf', 'w'):
+            pass
     try:
         print('in the try')
         the_hotspot = Hotspot.objects.get(wifi_device=wifi_device)
@@ -124,21 +163,36 @@ def main(id, change):
         hostapd_sample = hostapd_sample.replace('++++', the_hotspot.password)
     with open('/etc/default/hostapd', 'r') as f:
         hostapd = f.readlines()
-    if (getcwd() + '/oikos/hotspot/hostapd.conf') not in hostapd:
+    if the_hospot.on_boot == True:
         with open(getcwd() + '/oikos/hotspot/hostapd', 'w') as f:
             for line in hostapd:
                 if 'DAEMON_CONF=' in line:
-                    f.write('DAEMON_CONF="{}/oikos/hotspot/hostapd.conf"'.format(getcwd()) + "\n")
+                    f.write('DAEMON_CONF="{}/oikos/hotspot/hostapd.conf"'.format(getcwd()))
+                else:
+                    f.write(line)
+    else:
+        with open(getcwd() + '/oikos/hotspot/hostapd', 'w') as f:
+            for line in hostapd:
+                if 'DAEMON_CONF=' in line:
+                    f.write('DAEMON_CONF="{}/oikos/hotspot/hostapd.conf"'.format(getcwd()))
                 else:
                     f.write(line)
     with open(getcwd() + '/oikos/hotspot/hostapd', 'r') as f:
         hostapd = f.read()
     with open('/etc/default/hostapd', 'w') as default_conf:
         default_conf.write(hostapd)
-    with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
-        new_conf = f.read()
-    with open('/etc/default/hostapd', 'w') as default_conf:
-        default_conf.write(new_conf)
+    if (stat(getcwd() + "/oikos/hotspot/hostapd.conf").st_size > 0):
+        with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'r') as f:
+            hostapd_origin = f.read()
+    else:
+        hostapd_origin = None
+    with open(getcwd() + '/oikos/hotspot/hostapd_sample.conf', 'r') as f_hotspot:
+        hostapd_sample = f_hotspot.read()
+    hostapd_sample = hostapd_sample.replace('####', wifi_device.name)
+    hostapd_sample = hostapd_sample.replace('%%%%', the_hotspot.name)
+    hostapd_sample = hostapd_sample.replace('++++', the_hotspot.password)
+    with open(getcwd() + '/oikos/hotspot/hostapd.conf', 'w') as f:
+        f.write(hostapd_sample + '\n' + hostapd_origin)
     Popen(['sudo', 'ifconfig', wifi_device.name, 'down'], stdout=PIPE, stderr=PIPE)
     with open('/etc/dhcpcd.conf', 'r') as f:
         dhcpcd = f.readlines()
