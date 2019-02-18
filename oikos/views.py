@@ -372,6 +372,7 @@ def hotspot_submit(request):
 
     from django.http import HttpResponseRedirect
 
+    from .models import Hotspot
     from .forms import HotspotForm
 
     from .hotspot import add_hotspot
@@ -382,6 +383,7 @@ def hotspot_submit(request):
             the_hotspot = Hotspot.objects.get(hotspot_form.name)
             the_hotspot.name = hotspot_form.name
             the_hotspot.password = hotspot_form.password
+            the_hotspot.on_boot = hotspot_form.on_boot
             the_hotspot.save()
             add_hotspot.change(the_hotspot.wifi_device.id)
 
