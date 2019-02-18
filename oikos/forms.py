@@ -26,7 +26,7 @@ class HotspotForm(forms.ModelForm):
     class Meta:
         model = Hotspot
         fields = ['name','password','on_boot']
-        forms.CharField(label='name',required=True)
+        name = forms.CharField(label='name',required=True)
         password = forms.CharField(widget=forms.PasswordInput)
         on_boot = forms.BooleanField(label='on_boot',required=True,widget=forms.CheckboxInput())
 
