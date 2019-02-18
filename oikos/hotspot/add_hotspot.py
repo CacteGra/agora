@@ -163,7 +163,7 @@ def main(id):
         hostapd_sample = hostapd_sample.replace('++++', the_hotspot.password)
     with open('/etc/default/hostapd', 'r') as f:
         hostapd = f.readlines()
-    if the_hospot.on_boot == True:
+    if the_hotspot.on_boot == True:
         with open(getcwd() + '/oikos/hotspot/hostapd', 'w') as f:
             for line in hostapd:
                 if 'DAEMON_CONF=' in line:
