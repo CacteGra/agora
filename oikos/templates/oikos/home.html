@@ -74,7 +74,6 @@
         <div>
           <form method="POST" action="{% url 'wifi_turn' wifi_single.id %}"  class="post-form">
             {% csrf_token %}
-            <input type="hidden" name="{{ wifi_device_form.name.name }}" value="{{ wifi_single.name }}" id="{{ wifi_device_form.name.id_for_label }}">
             <button type="submit" class="btn btn-success mb-3">{{ wifi_single.name }} <i class="fas fa-wifi"></i></button>
           </form>
           {% if hotspot %}
@@ -235,7 +234,6 @@
         {% endfor %}
         <form method="POST" action="{% url 'wifi_turn' wifi_single.id %}"  class="post-form">
           {% csrf_token %}
-          <input type="hidden" name="{{ wifi_device_form.name.name }}" value="{{ wifi_single.name }}" id="{{ wifi_device_form.name.id_for_label }}">
           <button type="submit" class="btn btn-primary mb-3">{{ wifi_single.name }} <i class="fas fa-wifi"></i></button>
         </form>
         <form method="POST" action="{% url 'hotspot_turn' wifi_single.id %}"  class="post-form">

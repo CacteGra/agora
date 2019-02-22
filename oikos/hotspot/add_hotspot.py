@@ -77,6 +77,7 @@ def delete_hotspot(id):
         default_conf.write(new_conf)
     Popen(['sudo', 'systemctl', 'daemon-reload'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'restart dhcpcd'], stdout=PIPE, stderr=PIPE)
+    Popen(['sudo', 'ifconfig', the_hotspot.wifi_device.name, 'up'], stdout=PIPE, stderr=PIPE)
 
 def change(id):
     wifi_device = WifiDevice.objects.get(id=id)

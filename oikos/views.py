@@ -170,7 +170,7 @@ def wifi_turn(request, wifi_device_id):
                 iwconfig = check_output(['iwconfig', wifi_device.name]).decode('utf-8')
                 if 'Master' in iwconfig:
                     add_hotspot.delete_hotspot(wifi_device.id)
-                wifi_scan_connect.turn_off(wifi_device.name)
+                wifi_scan_connect.turn_off(wifi_device.id)
                 print(wifi_device.name)
             else:
                 Wifi.objects.filter(wifi_device__name=wifi_device.name).update(available=False,connected=False)

@@ -12,7 +12,6 @@ def get_wifi(wifi_device):
 def connect(wifi_mac_address,interface_name):
     from os import stat, getcwd
     from subprocess import Popen, PIPE, check_output
-    from time import sleep
 
     from django.db.models import Q
 
@@ -67,13 +66,14 @@ def scan_only(wifi_device):
         scanned_wifi.available = True
         scanned_wifi.save()
 
-def turn_off(wifi_device):
+def turn_off(wifi_device_id):
     from subprocess import Popen, PIPE, check_output
-    from time import sleep
+    from oikos.models import WifiDevice
 
     with open('/etc/wpa_supplicant/wpa_supplicant.conf', 'w') as f:
         pass
 
+    wifi_device_object = WifiDevice.objects.get(id=wifi_device_id)
     print('nice shoe')
     Popen(['sudo', 'wpa_cli', '-i', wifi_device, 'reconfigure'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'killall', 'wpa_supplicant'], stdout=PIPE, stderr=PIPE)
@@ -100,6 +100,8 @@ def turn_off(wifi_device):
     ifconfig = check_output(['ifconfig']).decode('utf-8')
     print(ifconfig)
     print('noel')
+    wifi_device_object.active = False
+    wifi_device_object.save()
     return True
 
 def main(wifi_device):
