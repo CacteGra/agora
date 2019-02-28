@@ -75,7 +75,7 @@ def turn_off(wifi_device_id):
 
     wifi_device_object = WifiDevice.objects.get(id=wifi_device_id)
     print('nice shoe')
-    Popen(['sudo', 'wpa_cli', '-i', wifi_device, 'reconfigure'], stdout=PIPE, stderr=PIPE)
+    Popen(['sudo', 'wpa_cli', '-i', wifi_device_object.name, 'reconfigure'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'killall', 'wpa_supplicant'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'stop', 'wpa_supplicant.service'], stdout=PIPE, stderr=PIPE)
     Popen(['sudo', 'systemctl', 'disable', 'wpa_supplicant'], stdout=PIPE, stderr=PIPE)
@@ -96,7 +96,7 @@ def turn_off(wifi_device_id):
     ifconfig = check_output(['ifconfig']).decode('utf-8')
     print(dhcpcd_restart_count)
     print('nice shoe3')
-    Popen(['sudo', 'ifconfig', wifi_device, 'down'], stdout=PIPE, stderr=PIPE)
+    Popen(['sudo', 'ifconfig', wifi_device_object.name, 'down'], stdout=PIPE, stderr=PIPE)
     ifconfig = check_output(['ifconfig']).decode('utf-8')
     print(ifconfig)
     print('noel')

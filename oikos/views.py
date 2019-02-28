@@ -126,7 +126,6 @@ def home(request):
     then_now = datetime.now() - first_now
     first_now = datetime.now()
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
-    wifi_device_form = WifiDeviceForm(request.POST)
     wifi_form = WifiForm(request.POST)
     wifi_forget_form = WifiForgetForm(request.POST)
     hotspot_form = HotspotForm(request.POST)
@@ -138,7 +137,7 @@ def home(request):
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
     then_zero = datetime.now() - zero_now
     print("{} {}minutes ".format(then_zero.days, then_zero.seconds // 3600))
-    return render(request, 'oikos/home.html', {'wifi_set': wifi_set, 'available_wifis': available_wifis, 'bluetooths': bluetooths, 'bluetooth_primals': bluetooth_primals, 'bluetooth_primals_form': bluetooth_primals_form, 'bluetooth_devices': bluetooth_devices, 'wifi_device_form': wifi_device_form, 'hotspot': hotspot, 'hotspot_form': hotspot_form, 'wifi_form': wifi_form, 'wifi_forget_form': wifi_forget_form, 'power_form': power_form})
+    return render(request, 'oikos/home.html', {'wifi_set': wifi_set, 'available_wifis': available_wifis, 'bluetooths': bluetooths, 'bluetooth_primals': bluetooth_primals, 'bluetooth_primals_form': bluetooth_primals_form, 'bluetooth_devices': bluetooth_devices, 'hotspot': hotspot, 'hotspot_form': hotspot_form, 'wifi_form': wifi_form, 'wifi_forget_form': wifi_forget_form, 'power_form': power_form})
 
 def wifi_turn(request, wifi_device_id):
     from subprocess import Popen, PIPE, check_output
@@ -152,39 +151,36 @@ def wifi_turn(request, wifi_device_id):
     from .models import WifiDevice, Wifi, Hotspot
     from .forms import WifiDeviceForm
 
-    wifi_device_form = WifiDeviceForm(request.POST)
     print("keyword_delete views")
     if request.method == 'POST':
-        if wifi_device_form.is_valid():
-            try:
-                wifi_device = WifiDevice.objects.get(id=wifi_device_id)
-            except WifiDevice.DoesNotExist:
-                return HttpResponseRedirect('/')
-            print(wifi_device)
-            print(wifi_device.id)
-            wifi_device.save()
-            ifconfig = check_output(['ifconfig']).decode('utf-8')
-            print(ifconfig)
-            if wifi_device.name in ifconfig:
-                print('bringing it down')
-                iwconfig = check_output(['iwconfig', wifi_device.name]).decode('utf-8')
-                if 'Master' in iwconfig:
-                    add_hotspot.delete_hotspot(wifi_device.id)
-                wifi_scan_connect.turn_off(wifi_device.id)
-                print(wifi_device.name)
-            else:
-                Wifi.objects.filter(wifi_device__name=wifi_device.name).update(available=False,connected=False)
-                sub_proc = check_output(['sudo', 'ifconfig', wifi_device.name, 'down']).decode('utf-8')
+        try:
+            wifi_device = WifiDevice.objects.get(id=wifi_device_id)
+        except WifiDevice.DoesNotExist:
+            return HttpResponseRedirect('/')
+        print(wifi_device)
+        print(wifi_device.id)
+        ifconfig = check_output(['ifconfig']).decode('utf-8')
+        print(ifconfig)
+        if wifi_device.name in ifconfig:
+            print('bringing it down')
+            iwconfig = check_output(['iwconfig', wifi_device.name]).decode('utf-8')
+            if 'Master' in iwconfig:
                 add_hotspot.delete_hotspot(wifi_device.id)
-                Hotspot.objects.filter(wifi_device__name=wifi_device.name).update(active=False)
-                Popen(['sudo', 'ifconfig', wifi_device.name, 'up'], stdout=PIPE, stderr=PIPE)
+            wifi_scan_connect.turn_off(wifi_device.id)
+            print(wifi_device.name)
+        else:
+            Wifi.objects.filter(wifi_device__name=wifi_device.name).update(available=False,connected=False)
+            sub_proc = check_output(['sudo', 'ifconfig', wifi_device.name, 'down']).decode('utf-8')
+            add_hotspot.delete_hotspot(wifi_device.id)
+            Hotspot.objects.filter(wifi_device__name=wifi_device.name).update(active=False)
+            Popen(['sudo', 'ifconfig', wifi_device.name, 'up'], stdout=PIPE, stderr=PIPE)
+            ifconfig = check_output(['ifconfig']).decode('utf-8')
+            while wifi_device.name not in ifconfig:
+                sleep(0.10)
+                print(wifi_device.name)
+                print(ifconfig)
                 ifconfig = check_output(['ifconfig']).decode('utf-8')
-                while wifi_device.name not in ifconfig:
-                    sleep(0.10)
-                    print(wifi_device.name)
-                    print(ifconfig)
-                    ifconfig = check_output(['ifconfig']).decode('utf-8')
-                wifi_scan_connect.main(wifi_device.name)
+            wifi_scan_connect.main(wifi_device.name)
 
     return HttpResponseRedirect('/')
 
