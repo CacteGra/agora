@@ -85,6 +85,7 @@ def turn_on():
     Popen(['sudo', 'systemctl', 'start', 'panr'], stdout=PIPE, stderr=PIPE)
     bluetooth_status, err = Popen(['sudo', 'systemctl', 'status', 'bluetooth'], stdout=PIPE, stderr=PIPE).communicate()
     print(bluetooth_status.decode('utf-8'))
+    controller_show()
 
 def main(bluetooth_device_id=None):
 

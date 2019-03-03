@@ -152,35 +152,34 @@ def wifi_turn(request, wifi_device_id):
     from .forms import WifiDeviceForm
 
     print("keyword_delete views")
-    if request.method == 'POST':
-        try:
-            wifi_device = WifiDevice.objects.get(id=wifi_device_id)
-        except WifiDevice.DoesNotExist:
-            return HttpResponseRedirect('/')
-        print(wifi_device)
-        print(wifi_device.id)
-        ifconfig = check_output(['ifconfig']).decode('utf-8')
-        print(ifconfig)
-        if wifi_device.name in ifconfig:
-            print('bringing it down')
-            iwconfig = check_output(['iwconfig', wifi_device.name]).decode('utf-8')
-            if 'Master' in iwconfig:
-                add_hotspot.delete_hotspot(wifi_device.id)
-            wifi_scan_connect.turn_off(wifi_device.id)
-            print(wifi_device.name)
-        else:
-            Wifi.objects.filter(wifi_device__name=wifi_device.name).update(available=False,connected=False)
-            sub_proc = check_output(['sudo', 'ifconfig', wifi_device.name, 'down']).decode('utf-8')
+    try:
+        wifi_device = WifiDevice.objects.get(id=wifi_device_id)
+    except WifiDevice.DoesNotExist:
+        return HttpResponseRedirect('/')
+    print(wifi_device)
+    print(wifi_device.id)
+    ifconfig = check_output(['ifconfig']).decode('utf-8')
+    print(ifconfig)
+    if wifi_device.name in ifconfig:
+        print('bringing it down')
+        iwconfig = check_output(['iwconfig', wifi_device.name]).decode('utf-8')
+        if 'Master' in iwconfig:
             add_hotspot.delete_hotspot(wifi_device.id)
-            Hotspot.objects.filter(wifi_device__name=wifi_device.name).update(active=False)
-            Popen(['sudo', 'ifconfig', wifi_device.name, 'up'], stdout=PIPE, stderr=PIPE)
+        wifi_scan_connect.turn_off(wifi_device.id)
+        print(wifi_device.name)
+    else:
+        Wifi.objects.filter(wifi_device__name=wifi_device.name).update(available=False,connected=False)
+        add_hotspot.delete_hotspot(wifi_device.id)
+        Hotspot.objects.filter(wifi_device__name=wifi_device.name).update(active=False)
+        Popen(['sudo', 'ifconfig', wifi_device.name, 'up'], stdout=PIPE, stderr=PIPE)
+        ifconfig = check_output(['ifconfig']).decode('utf-8')
+        while wifi_device.name not in ifconfig:
+            sleep(0.10)
+            print(wifi_device.name)
+            print(ifconfig)
             ifconfig = check_output(['ifconfig']).decode('utf-8')
-            while wifi_device.name not in ifconfig:
-                sleep(0.10)
-                print(wifi_device.name)
-                print(ifconfig)
-                ifconfig = check_output(['ifconfig']).decode('utf-8')
-            wifi_scan_connect.main(wifi_device.name)
+        Wifi.objects.filter(wifi_device__name=wifi_device.name).update(available=True)
+        wifi_scan_connect.main(wifi_device.name)
 
     return HttpResponseRedirect('/')
 
