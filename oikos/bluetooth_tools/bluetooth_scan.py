@@ -45,8 +45,6 @@ def scan(bl, bluetooth_device_id):
         the_bluetooth, created = Bluetooth.objects.get_or_create(mac_address=bluetooth['mac_address'])
         if the_bluetooth.name != bluetooth['name']:
             the_bluetooth.name = bluetooth['name']
-        the_bluetooth.last_updated = datetime.utcnow()
-        the_bluetooth.available = True
         the_bluetooth.bluetooth_device = bluetooth_device
         if any(d['mac_address'] == the_bluetooth.mac_address for d in paired):
             the_bluetooth.paired = True

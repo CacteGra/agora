@@ -16,7 +16,7 @@ class WifiDevice(models.Model):
 class Wifi(models.Model):
     name = models.CharField(max_length=100,null=True)
     ssid = models.CharField(max_length=100,null=True)
-    mac_address = models.CharField(max_length=100,null=True)
+    mac_address = models.CharField(max_length=100,null=True,unique=True)
     password = models.CharField(max_length=100,null=True)
     encryption_type = models.CharField(max_length=100,null=True)
     available = models.BooleanField(default=False)
@@ -28,7 +28,7 @@ class Wifi(models.Model):
 
 class BluetoothDevice(models.Model):
     name = models.CharField(max_length=100,null=True)
-    mac_address = models.CharField(max_length=100,null=True)
+    mac_address = models.CharField(max_length=100,null=True,unique=True)
     powered = models.BooleanField(default=False)
     discoverable = models.BooleanField(default=False)
     pairable = models.BooleanField(default=False)
@@ -37,10 +37,10 @@ class Bluetooth(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
     username = models.TextField(null=True)
     name = models.CharField(max_length=100,null=True)
-    mac_address = models.CharField(max_length=100,null=True)
+    mac_address = models.CharField(max_length=100,null=True,unique=True)
     password = models.CharField(max_length=100,null=True)
     email = models.CharField(max_length=100,null=True)
-    available = models.BooleanField(default=False)
+    available = models.BooleanField(default=True)
     paired = models.BooleanField(default=False)
     strength = models.CharField(max_length=4,null=True)
     date_updated = models.DateTimeField(default=timezone.now)
@@ -50,7 +50,7 @@ class Bluetooth(models.Model):
 class Hotspot(models.Model):
     name = models.CharField(max_length=100,null=True)
     password = models.CharField(max_length=100,null=True)
-    wifi_device = models.OneToOneField(WifiDevice,on_delete=models.CASCADE,primary_key=True)
+    wifi_device = models.OneToOneField(WifiDevice,on_delete=models.CASCADE,primary_key=True,unique=True)
     rand_ip = models.PositiveIntegerField(null=True)
     active = models.BooleanField(default=False)
     on_boot = models.BooleanField(default=False)

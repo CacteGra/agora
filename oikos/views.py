@@ -148,7 +148,7 @@ def wifi_turn(request, wifi_device_id):
 
     from django.http import HttpResponseRedirect
 
-    from .models import WifiDevice, Wifi, Hotspot
+    from .models import WifiDevice, Wifi, Hotspot, Bluetooth
     from .forms import WifiDeviceForm
 
     print("keyword_delete views")
@@ -161,12 +161,14 @@ def wifi_turn(request, wifi_device_id):
     ifconfig = check_output(['ifconfig']).decode('utf-8')
     print(ifconfig)
     if wifi_device.name in ifconfig:
-        print('bringing it down')
-        iwconfig = check_output(['iwconfig', wifi_device.name]).decode('utf-8')
-        if 'Master' in iwconfig:
-            add_hotspot.delete_hotspot(wifi_device.id)
-        wifi_scan_connect.turn_off(wifi_device.id)
-        print(wifi_device.name)
+        paired_bluetooths = Bluetooth.objects.filter(paired=True)
+        if paired_bluetooths.count() > 0:
+            print('bringing it down')
+            iwconfig = check_output(['iwconfig', wifi_device.name]).decode('utf-8')
+            if 'Master' in iwconfig:
+                add_hotspot.delete_hotspot(wifi_device.id)
+            wifi_scan_connect.turn_off(wifi_device.id)
+            print(wifi_device.name)
     else:
         Wifi.objects.filter(wifi_device__name=wifi_device.name).update(available=False,connected=False)
         add_hotspot.delete_hotspot(wifi_device.id)
@@ -259,7 +261,7 @@ def wifi_forget(request):
             wifi_forget_form_wait = wifi_forget_form.save(commit=False)
             wifi = Wifi.objects.filter(mac_address=wifi_forget_form_wait.mac_address)
             wifi.update(known=False,connected=False,password=None)
-            wifi_scan_connect.turn_off(wifi.wifi_device.name)
+            wifi_scan_connect.turn_off(wifi.wifi_device.id)
             Popen(['sudo', 'ifconfig', wifi_device, 'up'], stdout=PIPE, stderr=PIPE)
 
     return HttpResponseRedirect('/')
@@ -287,7 +289,7 @@ def bluetooth_turn(request, bluetooth_device_id):
             bluetooth_scan.turn_on()
             controller = bluetooth_scan.controller_show()
             bluetooth_device = BluetoothDevice.objects.get(id=controller)
-            bluetooth_scan.main()
+            bluetooth_scan.main(bluetooth_device_id=controller)
     return HttpResponseRedirect('/')
 
 
@@ -353,11 +355,11 @@ def hotspot_turn(request, wifi_device_id):
             add_hotspot.delete_hotspot(wifi_device.id)
         else:
             if Hotspot.objects.filter(wifi_device=wifi_device,primary=True).count() > 0:
-                wifi_scan_connect.turn_off(wifi_device.name)
+                wifi_scan_connect.turn_off(wifi_device.id)
                 add_hotspot.main(wifi_device.id)
             else:
                 Hotspot.objects.filter(wifi_device=wifi_device).update(active=False)
-                wifi_scan_connect.turn_off(wifi_device.name)
+                wifi_scan_connect.turn_off(wifi_device.id)
                 add_hotspot.main(wifi_device.id)
 
     return HttpResponseRedirect('/')
