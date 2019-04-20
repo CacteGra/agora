@@ -23,7 +23,7 @@ def home(request):
     first_now = datetime.now()
     if BluetoothDevice.objects.filter(powered=True).count() > 0:
         print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
-        bluetooth_active, err = Popen(['systemctl', 'is-active', 'bluetooth'],stdout=PIPE, stderr=PIPE).communicate()
+        bluetooth_active, err = Popen(['systemctl', 'is-active', 'bluetooth'], stdout=PIPE, stderr=PIPE).communicate()
         if bluetooth_active.decode('utf-8').replace('\n', '') == 'active':
             if Bluetooth.objects.filter(primal=True).count() == 0:
                 controller = bluetooth_scan.controller_show()
@@ -70,11 +70,11 @@ def home(request):
             if "inet " in ifconfig:
                 print("is inet wlan0")
                 iwconfig = check_output(['iwconfig', available_interface]).decode('utf-8')
-                word = search('ESSID:"(.+?)"', iwconfig)
+                word = search('Access Point:"(.+?)"', iwconfig)
                 if word and ('Master' not in iwconfig):
                     print("is word wlan0")
-                    ssid = word.group(1)
-                    active_wifi = Wifi.objects.get(ssid=ssid)
+                    mac_address = word.group(1)
+                    active_wifi = Wifi.objects.get(mac_address=mac_address)
                     active_wifi.connected = True
                     active_wifi.save()
                 else:
@@ -119,7 +119,10 @@ def home(request):
     bluetooths = BluetoothDevice.objects.all()
     print('bluetooths')
     print(bluetooths)
-
+    connected_interface = popen("/sbin/ip route | awk '/default/ { print $5 }'").read()
+    inet = check_output(['ifconfig', connected_interface.replace('\n', '')])
+    inet = search('inet (.+?) ', inet.decode('utf-8'))
+    inet = inet.group(1)
     available_wifis = Wifi.objects.filter(available=True).order_by('-strength')
     for available_wifi in available_wifis:
         print(available_wifi.ssid)
@@ -137,7 +140,7 @@ def home(request):
     print("{} {}minutes ".format(then_now.days, then_now.seconds // 3600))
     then_zero = datetime.now() - zero_now
     print("{} {}minutes ".format(then_zero.days, then_zero.seconds // 3600))
-    return render(request, 'oikos/home.html', {'wifi_set': wifi_set, 'available_wifis': available_wifis, 'bluetooths': bluetooths, 'bluetooth_primals': bluetooth_primals, 'bluetooth_primals_form': bluetooth_primals_form, 'bluetooth_devices': bluetooth_devices, 'hotspot': hotspot, 'hotspot_form': hotspot_form, 'wifi_form': wifi_form, 'wifi_forget_form': wifi_forget_form, 'power_form': power_form})
+    return render(request, 'oikos/home.html', {'wifi_set': wifi_set, 'available_wifis': available_wifis, 'bluetooths': bluetooths, 'bluetooth_primals': bluetooth_primals, 'inet': inet, 'bluetooth_primals_form': bluetooth_primals_form, 'bluetooth_devices': bluetooth_devices, 'hotspot': hotspot, 'hotspot_form': hotspot_form, 'wifi_form': wifi_form, 'wifi_forget_form': wifi_forget_form, 'power_form': power_form})
 
 def wifi_turn(request, wifi_device_id):
     from subprocess import Popen, PIPE, check_output

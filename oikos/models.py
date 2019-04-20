@@ -10,7 +10,7 @@ class LocalServices(models.Model):
     worker_number = models.PositiveIntegerField(null=True)
 
 class WifiDevice(models.Model):
-    name = models.CharField(max_length=100,null=True)
+    name = models.CharField(max_length=100,null=True,unique=True)
     active = models.BooleanField(default=False)
 
 class Wifi(models.Model):

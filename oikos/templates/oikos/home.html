@@ -25,6 +25,8 @@
 <main role="main">
   <section class="mb-5">
     <div class="container text-center bg-light u-content-space col-lg-7 col-md-6 u-box-shadow-sm rounded mb-5">
+      <h3 class="h3">Local IP Address:</h3>
+      {{ inet }}
       <h2 class="h1">Power Off</h2>
       <form method="POST" action="{% url 'power_off' %}" class="post-form">
         {% csrf_token %}

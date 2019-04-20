@@ -223,7 +223,7 @@ class Bluetoothctl:
     def pair(self, mac_address):
         """Try to pair with a device by mac address."""
         try:
-            out = self.get_output("pair " + mac_address, 4)
+            out = self.get_output("pair " + mac_address)
         except BluetoothctlError as e:
             print(e)
             return None
@@ -235,7 +235,7 @@ class Bluetoothctl:
     def remove(self, mac_address):
         """Remove paired device by mac address, return success of the operation."""
         try:
-            out = self.get_output("remove " + mac_address, 3)
+            out = self.get_output("remove " + mac_address)
         except BluetoothctlError as e:
             print(e)
             return None
@@ -247,7 +247,7 @@ class Bluetoothctl:
     def connect(self, mac_address):
         """Try to connect to a device by mac address."""
         try:
-            out = self.get_output("connect " + mac_address, 2)
+            out = self.get_output("connect " + mac_address)
         except BluetoothctlError as e:
             print(e)
             return None
@@ -259,7 +259,7 @@ class Bluetoothctl:
     def disconnect(self, mac_address):
         """Try to disconnect to a device by mac address."""
         try:
-            out = self.get_output("disconnect " + mac_address, 2)
+            out = self.get_output("disconnect " + mac_address)
         except BluetoothctlError as e:
             print(e)
             return None
@@ -271,7 +271,7 @@ class Bluetoothctl:
     def trust(self, mac_address):
         """Trust the device with the given MAC address"""
         try:
-            out = self.get_output("trust " + mac_address, 4)
+            out = self.get_output("trust " + mac_address)
         except BluetoothctlError as e:
             print(e)
             return None
@@ -323,4 +323,3 @@ class Bluetoothctl:
             print(e)
             return None
         return self.parse_controller_info(out)
-
