@@ -61,4 +61,4 @@ class OikosConfig(AppConfig):
                     else:
                         wifi_scan_connect.turn_off(wifi_device.id)
                         add_hotspot.main(wifi_device.id)
-                break
+                        break
